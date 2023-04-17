@@ -16,7 +16,7 @@ func main() {
 	db := model.ConnectDB()
 	user := model.User{
 		Name:     "test",
-		Uid:      "112233",
+		Uid:      "112233345",
 		Password: "233344",
 	}
 	db.Create(&user)
