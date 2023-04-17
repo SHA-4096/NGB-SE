@@ -2,7 +2,7 @@ package main
 
 import (
 	"NGB-SE/model"
-	"fmt"
+	"NGB-SE/view"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -11,15 +11,9 @@ import (
 func main() {
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
+		return c.String(http.StatusOK, "The server is running")
 	})
-	db := model.ConnectDB()
-	user := model.User{
-		Name:     "test",
-		Uid:      "112233345",
-		Password: "233344",
-	}
-	db.Create(&user)
-	fmt.Println("AAA")
+	model.ConnectDB() //use model.DB to operate
 	e.Logger.Fatal(e.Start(":1323"))
+	view.SetRouters(e)
 }
