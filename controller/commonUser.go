@@ -85,7 +85,7 @@ func DeleteUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, outData)
 	} else {
 		outData := map[string]interface{}{
-			"message": "用户已经注销",
+			"message": fmt.Sprintf("用户%s已经注销", c.Param("Uid")),
 		}
 		return c.JSON(http.StatusOK, outData)
 	}
