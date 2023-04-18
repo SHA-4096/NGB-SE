@@ -32,7 +32,7 @@ func verifyAdmin(c echo.Context) error {
 		return err
 	}
 	if claims["Uid"] != AdminId {
-		return fmt.Errorf("你是不是偷了别人的token???")
+		return fmt.Errorf("你的token似乎和你的身份不符")
 	}
 	if user.IsAdmin != "True" {
 		return fmt.Errorf("你不是管理员")
@@ -80,10 +80,10 @@ func AdminModifyUser(c echo.Context) error {
 	}
 	user := new(model.User)
 	err = model.DB.Where("Uid = ?", c.Param("Uid")).First(&user).Error
-	//找不到用户时
+	//查询出错时
 	if user.Uid == "" {
 		outData := map[string]interface{}{
-			"message": err,
+			"message": fmt.Sprintf("数据库出了问题耶，错误信息：%s", err),
 		}
 		return c.JSON(http.StatusBadRequest, outData)
 	}
