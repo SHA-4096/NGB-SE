@@ -32,3 +32,22 @@ func GetJwt(Uid string) (string, string, error) {
 	return signedToken, key, nil
 
 }
+
+func DecodeJwt(tokenString, key string) (jwt.MapClaims, error) {
+	/*return the claim of a token*/
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method")
+		}
+		return []byte(key), nil
+	})
+	if err != nil {
+		panic(err)
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+
+	if !ok && !token.Valid {
+		return nil, fmt.Errorf("token invalid")
+	}
+	return claims, nil
+}
