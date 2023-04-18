@@ -93,6 +93,7 @@ func AdminModifyUser(c echo.Context) error {
 	fieldValue := refUser.FieldByName(inData.Key)
 	if fieldValue.IsValid() {
 		fieldValue.SetString(inData.Value)
+		model.DB.Save(&user)
 		outData := map[string]interface{}{
 			"message": fmt.Sprintf("用户%s的%s值被修改为%s", c.Param("Uid"), inData.Key, inData.Value),
 		}
