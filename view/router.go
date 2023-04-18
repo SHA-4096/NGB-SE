@@ -9,5 +9,5 @@ import (
 func SetRouters(e *echo.Echo) {
 	e.POST("/user/register", controller.Register)
 	e.POST("/user/login", controller.Login)
-	e.POST("/user/verify/:Uid", controller.VerifyUser)
+	e.POST("/user/delete/:Uid", controller.DeleteUser)
 }

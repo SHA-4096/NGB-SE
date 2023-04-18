@@ -7,5 +7,6 @@ type User struct {
 	Uid      string
 	Name     string
 	Password string
-	Jwt_key  string
+	JwtKey   string
+	IsAdmin  string
 }

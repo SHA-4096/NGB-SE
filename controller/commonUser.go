@@ -15,7 +15,7 @@ func Register(c echo.Context) error {
 	if err := c.Bind(user); err != nil {
 		return err
 	}
-
+	user.IsAdmin = "False"
 	data := map[string]interface{}{
 		"message": "注册成功",
 	}
@@ -37,7 +37,7 @@ func Login(c echo.Context) error {
 	if err != nil {
 		panic(err)
 	}
-	user.Jwt_key = key
+	user.JwtKey = key
 	model.DB.Save(&user)
 	outData := map[string]interface{}{
 		"token":   token,
@@ -47,25 +47,47 @@ func Login(c echo.Context) error {
 
 }
 
-func VerifyUser(c echo.Context) error {
-	/*GET with token,src = /user/verify/:Uid */
+func verifyUser(c echo.Context) error {
 	Uid := c.Param("Uid")
 	user := new(model.User)
 	model.DB.Where("Uid = ?", Uid).First(&user)
 	if user.Uid == "" {
-		return c.String(http.StatusUnauthorized, "您不是已注册用户")
+		return fmt.Errorf("您不是已注册用户")
 	}
 	tokenRaw := c.Request().Header.Get("Authorization")
-	token := (strings.Split(tokenRaw, " "))[1]
-	fmt.Println("TOKEN IS:", token)
-	key := user.Jwt_key
-	claims, err := DecodeJwt(token, key)
+	token := (strings.Split(tokenRaw, " "))
+	if len(token) < 2 {
+		return fmt.Errorf("你没有在请求头携带token")
+	}
+	fmt.Println("TOKEN IS:", token[1])
+	key := user.JwtKey
+	claims, err := DecodeJwt(token[1], key)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, err.Error())
+		return err
 	}
 	if claims["Uid"] != Uid {
-		return c.String(http.StatusForbidden, "你的token无效")
+		return fmt.Errorf("你的token无效")
 	}
-	return c.String(http.StatusOK, "用户认证成功")
+	return nil
+}
+
+func DeleteUser(c echo.Context) error {
+	/*GET src = /user/delete/:Uid*/
+	err := verifyUser(c)
+	if err != nil {
+		return c.String(http.StatusUnauthorized, err.Error())
+	}
+	err = model.DB.Where("Uid = ?", c.Param("Uid")).Delete(&model.User{}).Error
+	if err != nil {
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
+	} else {
+		outData := map[string]interface{}{
+			"message": "用户已经注销",
+		}
+		return c.JSON(http.StatusOK, outData)
+	}
 
 }
