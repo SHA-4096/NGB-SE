@@ -42,9 +42,14 @@ func DecodeJwt(tokenString, key string) (jwt.MapClaims, error) {
 		return []byte(key), nil
 	})
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
+	expTime, _ := claims["exp"].(time.Time)
+	//检查token是否过期
+	if expTime.Before(time.Now()) {
+		return nil, fmt.Errorf("token expired")
+	}
 
 	if !ok && !token.Valid {
 		return nil, fmt.Errorf("token invalid")

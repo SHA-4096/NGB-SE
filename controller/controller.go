@@ -61,10 +61,10 @@ func VerifyUser(c echo.Context) error {
 	key := user.Jwt_key
 	claims, err := DecodeJwt(token, key)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "解密token时出错")
+		return c.String(http.StatusInternalServerError, err.Error())
 	}
 	if claims["Uid"] != Uid {
-		return c.String(http.StatusUnauthorized, "你的token无效")
+		return c.String(http.StatusForbidden, "你的token无效")
 	}
 	return c.String(http.StatusOK, "用户认证成功")
 
