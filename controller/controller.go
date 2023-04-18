@@ -9,20 +9,20 @@ import (
 
 func Register(c echo.Context) error {
 	/*POST Uid;Name;Password*/
-	uid := c.FormValue("Uid")
-	name := c.FormValue("Name")
-	password := c.FormValue("password")
-	token, key, err := GetJwt(uid)
+	user := new(model.User)
+	if err := c.Bind(user); err != nil {
+		return err
+	}
+
+	token, key, err := GetJwt(user.Uid)
 	if err != nil {
 		panic(err)
 	}
-
-	user := model.User{
-		Name:     name,
-		Uid:      uid,
-		Password: password,
-		Jwt_key:  key,
+	data := map[string]interface{}{
+		"token": token,
 	}
+	user.Jwt_key = key
 	model.DB.Create(&user)
-	return c.String(http.StatusOK, "JWT:"+token)
+	return c.JSON(http.StatusCreated, data)
+	//	return c.String(http.StatusOK, "JWT:"+token)
 }
