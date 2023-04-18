@@ -14,6 +14,7 @@ func main() {
 		return c.String(http.StatusOK, "The server is running")
 	})
 	model.ConnectDB() //use model.DB to operate
-	e.Logger.Fatal(e.Start(":1323"))
 	view.SetRouters(e)
+	e.Logger.Fatal(e.Start(":1323"))
+
 }
