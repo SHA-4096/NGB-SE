@@ -30,9 +30,12 @@ func Login(c echo.Context) error {
 	inData := new(model.User)
 	c.Bind(inData)
 	var user model.User
-	model.DB.Where("Uid = ?", inData.Uid).First(&user)
+	model.DB.Where("Uid = ? AND Password= ?", inData.Uid, inData.Password).First(&user)
 	if user.Uid == "" {
-		return c.String(http.StatusUnauthorized, "You're not a registered user")
+		outData := map[string]interface{}{
+			"message": "帐号不存在或密码错误",
+		}
+		return c.JSON(http.StatusUnauthorized, outData)
 	}
 	token, key, err := GetJwt(user.Uid)
 	if err != nil {
