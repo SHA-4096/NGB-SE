@@ -17,20 +17,33 @@ func genkey() string {
 }
 
 const expHours = 1
+const refreshExpHours = 100
 
-func GetJwt(Uid string) (string, string, error) {
+func GetJwt(Uid string) (string, string, string, error) {
 	/*1st:token 2nd:key*/
-	expTime := time.Now().Add(time.Hour * expHours).Unix()
-	claims := jwt.MapClaims{}
-	claims["Uid"] = Uid
-	claims["exp"] = expTime
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	key := genkey()
-	signedToken, err := token.SignedString([]byte(key))
+	expTime := time.Now().Add(time.Hour * expHours).Unix()
+	refreshExpTime := time.Now().Add(time.Hour * refreshExpHours).Unix()
+	//生成jwtToken
+	jwtClaims := jwt.MapClaims{}
+	jwtClaims["Uid"] = Uid
+	jwtClaims["exp"] = expTime
+	tokenJwt := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaims)
+	jwtToken, err := tokenJwt.SignedString([]byte(key))
 	if err != nil {
 		panic(err)
 	}
-	return signedToken, key, nil
+	//生成refreshToken
+	refreshClaims := jwt.MapClaims{}
+	refreshClaims["Uid"] = Uid
+	refreshClaims["exp"] = refreshExpTime
+	refreshClaims["Randpayload"] = genkey() //用genkey弄一个新的随机数
+	tokenRefresh := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
+	refreshToken, err := tokenRefresh.SignedString([]byte(key))
+	if err != nil {
+		panic(err)
+	}
+	return jwtToken, refreshToken, key, nil
 
 }
 

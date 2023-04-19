@@ -60,15 +60,16 @@ func Login(c echo.Context) error {
 		}
 		return c.JSON(http.StatusUnauthorized, outData)
 	}
-	token, key, err := GetJwt(user.Uid)
+	jwtToken, refreshToken, key, err := GetJwt(user.Uid)
 	if err != nil {
 		panic(err)
 	}
 	user.JwtKey = key
 	model.DB.Save(&user)
 	outData := map[string]interface{}{
-		"token":   token,
-		"message": fmt.Sprintf("welcome:%s", user.Name),
+		"jwtToken":     jwtToken,
+		"refreshToken": refreshToken,
+		"message":      fmt.Sprintf("welcome:%s", user.Name),
 	}
 	return c.JSON(http.StatusOK, outData)
 
@@ -184,5 +185,40 @@ func ModifyUser(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, outData)
 	}
+
+}
+
+func RenewWithRefreshToken(c echo.Context) error {
+	/*GET方法,更新jwtToken,src = /user/:Uid/refreshtoken,请求头携带refreshToken*/
+	//检查用户
+	err := verifyUser(c)
+	if err != nil {
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusUnauthorized, outData)
+	}
+
+	user := new(model.User)
+	err = model.DB.Where("Uid = ?", c.Param("Uid")).First(&user).Error
+	if err != nil {
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusUnauthorized, outData)
+	}
+	//分发新的token
+	jwtToken, refreshToken, key, err := GetJwt(user.Uid)
+	if err != nil {
+		panic(err)
+	}
+	user.JwtKey = key
+	model.DB.Save(&user)
+	outData := map[string]interface{}{
+		"jwtToken":     jwtToken,
+		"refreshToken": refreshToken,
+		"message":      fmt.Sprintf("welcome:%s", user.Name),
+	}
+	return c.JSON(http.StatusOK, outData)
 
 }
