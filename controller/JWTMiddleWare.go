@@ -20,7 +20,7 @@ const expHours = 1
 
 func GetJwt(Uid string) (string, string, error) {
 	/*1st:token 2nd:key*/
-	expTime := time.Now().Add(time.Second * expHours).Unix()
+	expTime := time.Now().Add(time.Hour * expHours).Unix()
 	claims := jwt.MapClaims{}
 	claims["Uid"] = Uid
 	claims["exp"] = expTime

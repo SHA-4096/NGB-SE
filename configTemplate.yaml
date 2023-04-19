@@ -1,0 +1,8 @@
+#数据库配置(改名为config.yaml后使用)
+DataBase:
+  username: "YourUserName"
+  password: "YourPassword"
+  host: "localhost"
+  port: "3306"
+  dbName: "YourDbName"
+  timeout: "10s"
