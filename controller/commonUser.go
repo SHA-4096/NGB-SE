@@ -103,7 +103,7 @@ func LogOut(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, outData)
 	}
-	//删除用户
+	//注销用户
 	user.JwtKey = ""
 	model.DB.Save(&user)
 	outData := map[string]interface{}{
