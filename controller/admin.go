@@ -48,7 +48,7 @@ func AdminDeleteUser(c echo.Context) error {
 	}
 	//检查要删除的用户是否存在
 	user := new(model.User)
-	err = model.DB.Where("Uid=", c.Param("Uid")).First(&user).Error
+	err = model.DB.Where("Uid = ?", c.Param("Uid")).First(&user).Error
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func AdminDeleteUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, outData)
 	} else {
 		outData := map[string]interface{}{
-			"message": fmt.Sprintf("用户%s已经注销", c.Param("Uid")),
+			"message": fmt.Sprintf("用户%s已经删除", c.Param("Uid")),
 		}
 		return c.JSON(http.StatusOK, outData)
 	}
