@@ -20,7 +20,7 @@ const expHours = 1
 
 func GetJwt(Uid string) (string, string, error) {
 	/*1st:token 2nd:key*/
-	expTime := time.Now().Add(time.Hour * expHours).Unix()
+	expTime := time.Now().Add(time.Second * expHours).Unix()
 	claims := jwt.MapClaims{}
 	claims["Uid"] = Uid
 	claims["exp"] = expTime
@@ -47,14 +47,14 @@ func DecodeJwt(tokenString, key string) (jwt.MapClaims, error) {
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	fmt.Println(claims["exp"])
-	expTime, ok1 := claims["exp"].(int)
+	expTime, ok1 := claims["exp"].(float64)
 	fmt.Println(ok1)
-	fmt.Println(expTime, "-----", time.Now().Unix())
+	fmt.Println(int64(expTime), "-----", time.Now().Unix())
 	//检查token是否过期（发现有问题，到时再修）
-	/*if expTime < time.Now().Unix() {
+	if int64(expTime) < time.Now().Unix() {
 		return nil, fmt.Errorf("token expired")
 	}
-	*/
+
 	if !ok && !token.Valid {
 		return nil, fmt.Errorf("token invalid")
 	}
