@@ -10,6 +10,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type LogOutInData struct {
+	Uid string
+}
+
 func Register(c echo.Context) error {
 	/*POST Uid;Name;Password*/
 	user := new(model.User)
@@ -51,7 +55,35 @@ func Login(c echo.Context) error {
 
 }
 
+func LogOut(c echo.Context) error {
+	/*GET src = /user/:Uid/logout with token*/
+	err := verifyUser(c)
+	if err != nil {
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusUnauthorized, outData)
+	}
+	//从数据库里面取出用户
+	user := new(model.User)
+	err = model.DB.Where("Uid = ?", c.Param("Uid")).First(&user).Error
+	if err != nil {
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
+	}
+	//删除用户
+	user.JwtKey = ""
+	model.DB.Save(&user)
+	outData := map[string]interface{}{
+		"message": fmt.Sprintf("用户%s已经注销", c.Param("Uid")),
+	}
+	return c.JSON(http.StatusInternalServerError, outData)
+}
+
 func verifyUser(c echo.Context) error {
+	/*内部函数，用来验证用户,需要:Uid的路径参数以及token*/
 	Uid := c.Param("Uid")
 	user := new(model.User)
 	model.DB.Where("Uid = ?", Uid).First(&user)
@@ -89,7 +121,7 @@ func DeleteUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, outData)
 	} else {
 		outData := map[string]interface{}{
-			"message": fmt.Sprintf("用户%s已经注销", c.Param("Uid")),
+			"message": fmt.Sprintf("用户%s已经删除", c.Param("Uid")),
 		}
 		return c.JSON(http.StatusOK, outData)
 	}

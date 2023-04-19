@@ -50,7 +50,10 @@ func AdminDeleteUser(c echo.Context) error {
 	user := new(model.User)
 	err = model.DB.Where("Uid = ?", c.Param("Uid")).First(&user).Error
 	if err != nil {
-		return err
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
 	}
 	err = model.DB.Where("Uid = ?", c.Param("Uid")).Delete(&model.User{}).Error
 	if err != nil {

@@ -10,7 +10,8 @@ import (
 
 func genkey() string {
 	/*return a string as jwt key*/
-	seed1 := rand.Intn(10000000000000)
+	rand.Seed(time.Now().Unix())
+	seed1 := time.Now().Unix() + int64(rand.Int())
 	seed2 := "AVerySecureKey:)" //先这样用着吧（）
 	return fmt.Sprintf("%d%s", seed1, seed2)
 }
