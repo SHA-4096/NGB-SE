@@ -18,12 +18,12 @@ func genkey() string {
 
 const expHours = 1
 const refreshExpHours = 100
+const refreshTokenKey = "ARefreshTokenKeySetByMeAWAQWQ"
 
-func GetJwt(Uid string) (string, string, string, error) {
+func GetJwt(Uid string) (string, string, error) {
 	/*1st:token 2nd:key*/
 	key := genkey()
 	expTime := time.Now().Add(time.Hour * expHours).Unix()
-	refreshExpTime := time.Now().Add(time.Hour * refreshExpHours).Unix()
 	//生成jwtToken
 	jwtClaims := jwt.MapClaims{}
 	jwtClaims["Uid"] = Uid
@@ -33,18 +33,24 @@ func GetJwt(Uid string) (string, string, string, error) {
 	if err != nil {
 		panic(err)
 	}
+
+	return jwtToken, key, nil
+
+}
+
+func GetRefreshJwt(Uid string) (string, error) {
 	//生成refreshToken
+	refreshExpTime := time.Now().Add(time.Hour * refreshExpHours).Unix()
 	refreshClaims := jwt.MapClaims{}
 	refreshClaims["Uid"] = Uid
 	refreshClaims["exp"] = refreshExpTime
 	refreshClaims["Randpayload"] = genkey() //用genkey弄一个新的随机数
 	tokenRefresh := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
-	refreshToken, err := tokenRefresh.SignedString([]byte(key))
+	refreshToken, err := tokenRefresh.SignedString([]byte(refreshTokenKey))
 	if err != nil {
 		panic(err)
 	}
-	return jwtToken, refreshToken, key, nil
-
+	return refreshToken, nil
 }
 
 func DecodeJwt(tokenString, key string) (jwt.MapClaims, error) {
@@ -59,10 +65,10 @@ func DecodeJwt(tokenString, key string) (jwt.MapClaims, error) {
 		return nil, err
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
-	fmt.Println(claims["exp"])
-	expTime, ok1 := claims["exp"].(float64)
-	fmt.Println(ok1)
-	fmt.Println(int64(expTime), "-----", time.Now().Unix())
+	//fmt.Println(claims["exp"])
+	expTime, _ := claims["exp"].(float64)
+	//fmt.Println(ok1)
+	//fmt.Println(int64(expTime), "-----", time.Now().Unix())
 	//检查token是否过期（发现有问题，到时再修）
 	if int64(expTime) < time.Now().Unix() {
 		return nil, fmt.Errorf("token expired")

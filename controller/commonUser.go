@@ -60,12 +60,22 @@ func Login(c echo.Context) error {
 		}
 		return c.JSON(http.StatusUnauthorized, outData)
 	}
-	jwtToken, refreshToken, key, err := GetJwt(user.Uid)
+	jwtToken, key, err := GetJwt(user.Uid)
 	if err != nil {
-		panic(err)
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
 	}
 	user.JwtKey = key
 	model.DB.Save(&user)
+	refreshToken, err := GetRefreshJwt(user.Uid)
+	if err != nil {
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
+	}
 	outData := map[string]interface{}{
 		"jwtToken":     jwtToken,
 		"refreshToken": refreshToken,
@@ -77,7 +87,7 @@ func Login(c echo.Context) error {
 
 func LogOut(c echo.Context) error {
 	/*GET src = /user/:Uid/logout with token*/
-	err := verifyUser(c)
+	_, err := verifyUser(c, false)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -102,34 +112,40 @@ func LogOut(c echo.Context) error {
 	return c.JSON(http.StatusInternalServerError, outData)
 }
 
-func verifyUser(c echo.Context) error {
-	/*内部函数，用来验证用户,需要:Uid的路径参数以及token*/
+func verifyUser(c echo.Context, isRefresh bool) (string, error) {
+	/*内部函数，用来验证用户,需要:Uid的路径参数以及token,会返回一个token和error*/
 	Uid := c.Param("Uid")
 	user := new(model.User)
 	model.DB.Where("Uid = ?", Uid).First(&user)
 	if user.Uid == "" {
-		return fmt.Errorf("您不是已注册用户")
+		return "", fmt.Errorf("您不是已注册用户")
 	}
 	tokenRaw := c.Request().Header.Get("Authorization")
 	token := (strings.Split(tokenRaw, " "))
 	if len(token) < 2 {
-		return fmt.Errorf("你没有在请求头携带token")
+		return "", fmt.Errorf("你没有在请求头携带token")
 	}
 	fmt.Println("TOKEN IS:", token[1])
-	key := user.JwtKey
+	var key string
+	if isRefresh {
+		key = refreshTokenKey
+	} else {
+		key = user.JwtKey
+	}
+
 	claims, err := DecodeJwt(token[1], key)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if claims["Uid"] != Uid {
-		return fmt.Errorf("你的token无效")
+		return "", fmt.Errorf("你的token无效")
 	}
-	return nil
+	return token[1], nil
 }
 
 func DeleteUser(c echo.Context) error {
 	/*GET src = /user/delete/:Uid*/
-	err := verifyUser(c)
+	_, err := verifyUser(c, false)
 	if err != nil {
 		return c.String(http.StatusUnauthorized, err.Error())
 	}
@@ -151,7 +167,7 @@ func DeleteUser(c echo.Context) error {
 func ModifyUser(c echo.Context) error {
 	/*POST src = /user/modify/:Uid with json containing key&value*/
 	inData := new(AdminModifyUserINData)
-	err := verifyUser(c)
+	_, err := verifyUser(c, false)
 	if err != nil {
 		return c.String(http.StatusUnauthorized, err.Error())
 	}
@@ -191,7 +207,7 @@ func ModifyUser(c echo.Context) error {
 func RenewWithRefreshToken(c echo.Context) error {
 	/*GET方法,更新jwtToken,src = /user/:Uid/refreshtoken,请求头携带refreshToken*/
 	//检查用户
-	err := verifyUser(c)
+	refreshToken, err := verifyUser(c, true)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -208,7 +224,7 @@ func RenewWithRefreshToken(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, outData)
 	}
 	//分发新的token
-	jwtToken, refreshToken, key, err := GetJwt(user.Uid)
+	jwtToken, key, err := GetJwt(user.Uid)
 	if err != nil {
 		panic(err)
 	}
