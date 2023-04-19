@@ -2,6 +2,8 @@ package controller
 
 import (
 	"NGB-SE/model"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -14,17 +16,34 @@ type LogOutInData struct {
 	Uid string
 }
 
+func encodeMethod(input string) string {
+	hash := md5.Sum([]byte(input))
+	return hex.EncodeToString(hash[:])
+}
+
 func Register(c echo.Context) error {
 	/*POST Uid;Name;Password*/
+	//检查id是否被使用
 	user := new(model.User)
+	checkUser := new(model.User)
 	if err := c.Bind(user); err != nil {
 		return err
 	}
+	err := model.DB.Where("Uid = ?", user.Uid).First(&checkUser).Error
+	if err == nil {
+		outData := map[string]interface{}{
+			"message": "这个用户id已经被占用了哦",
+		}
+		return c.JSON(http.StatusBadRequest, outData)
+
+	}
 	user.IsAdmin = "False"
+	user.Password = encodeMethod(user.Password)
+	model.DB.Create(&user)
+
 	data := map[string]interface{}{
 		"message": "注册成功",
 	}
-	model.DB.Create(&user)
 	return c.JSON(http.StatusCreated, data)
 	//	return c.String(http.StatusOK, "JWT:"+token)
 }
@@ -34,7 +53,7 @@ func Login(c echo.Context) error {
 	inData := new(model.User)
 	c.Bind(inData)
 	var user model.User
-	model.DB.Where("Uid = ? AND Password= ?", inData.Uid, inData.Password).First(&user)
+	model.DB.Where("Uid = ? AND Password= ?", inData.Uid, encodeMethod(inData.Password)).First(&user)
 	if user.Uid == "" {
 		outData := map[string]interface{}{
 			"message": "帐号不存在或密码错误",
