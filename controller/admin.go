@@ -44,7 +44,10 @@ func AdminDeleteUser(c echo.Context) error {
 	/*POST src = /user/admin/{adminID}/delete/{userID}*/
 	err := verifyAdmin(c)
 	if err != nil {
-		return c.String(http.StatusUnauthorized, err.Error())
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusUnauthorized, outData)
 	}
 	//检查要删除的用户是否存在
 	user := new(model.User)
@@ -73,13 +76,21 @@ func AdminDeleteUser(c echo.Context) error {
 func AdminModifyUser(c echo.Context) error {
 	/*POST src = /user/admin/modify/:Uid with json containing key&value*/
 	inData := new(AdminModifyUserINData)
+	//验证身份
 	err := verifyAdmin(c)
 	if err != nil {
-		return c.String(http.StatusUnauthorized, err.Error())
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusUnauthorized, outData)
 	}
+	//获取数据
 	err = c.Bind(inData)
 	if err != nil {
-		return c.String(http.StatusUnauthorized, err.Error())
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
 	}
 	user := new(model.User)
 	err = model.DB.Where("Uid = ?", c.Param("Uid")).First(&user).Error

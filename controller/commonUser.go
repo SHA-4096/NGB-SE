@@ -45,7 +45,6 @@ func Register(c echo.Context) error {
 		"message": "注册成功",
 	}
 	return c.JSON(http.StatusCreated, data)
-	//	return c.String(http.StatusOK, "JWT:"+token)
 }
 
 func Login(c echo.Context) error {
@@ -144,10 +143,13 @@ func verifyUser(c echo.Context, isRefresh bool) (string, error) {
 }
 
 func DeleteUser(c echo.Context) error {
-	/*GET src = /user/delete/:Uid*/
+	/*GET src = /user/delete/:Uid with token*/
 	_, err := verifyUser(c, false)
 	if err != nil {
-		return c.String(http.StatusUnauthorized, err.Error())
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusUnauthorized, outData)
 	}
 	err = model.DB.Where("Uid = ?", c.Param("Uid")).Delete(&model.User{}).Error
 	if err != nil {
@@ -167,13 +169,21 @@ func DeleteUser(c echo.Context) error {
 func ModifyUser(c echo.Context) error {
 	/*POST src = /user/modify/:Uid with json containing key&value*/
 	inData := new(AdminModifyUserINData)
+	//验证用户
 	_, err := verifyUser(c, false)
 	if err != nil {
-		return c.String(http.StatusUnauthorized, err.Error())
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusUnauthorized, outData)
 	}
+	//获取数据
 	err = c.Bind(inData)
 	if err != nil {
-		return c.String(http.StatusUnauthorized, err.Error())
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
 	}
 	user := new(model.User)
 	err = model.DB.Where("Uid = ?", c.Param("Uid")).First(&user).Error
@@ -226,7 +236,10 @@ func RenewWithRefreshToken(c echo.Context) error {
 	//分发新的token
 	jwtToken, key, err := GetJwt(user.Uid)
 	if err != nil {
-		panic(err)
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
 	}
 	user.JwtKey = key
 	model.DB.Save(&user)
