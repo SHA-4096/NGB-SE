@@ -1,11 +1,11 @@
 package controller
 
 import (
+	"NGB-SE/middleware"
 	"NGB-SE/model"
 	"fmt"
 	"net/http"
 	"reflect"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -15,34 +15,9 @@ type AdminModifyUserINData struct {
 	Value string
 }
 
-func verifyAdmin(c echo.Context) error {
-	AdminId := c.Param("AdminId")
-	user := new(model.User)
-	tokenRaw := c.Request().Header.Get("Authorization")
-	token := (strings.Split(tokenRaw, " "))
-	if len(token) < 2 {
-		return fmt.Errorf("你没有在请求头携带token")
-	}
-	fmt.Println("TOKEN IS:", token[1])
-	//检查管理员身份
-	model.DB.Where("Uid = ?", AdminId).First(&user)
-	key := user.JwtKey
-	claims, err := DecodeJwt(token[1], key)
-	if err != nil {
-		return err
-	}
-	if claims["Uid"] != AdminId {
-		return fmt.Errorf("你的token似乎和你的身份不符")
-	}
-	if user.IsAdmin != "True" {
-		return fmt.Errorf("你不是管理员")
-	}
-	return nil
-}
-
 func AdminDeleteUser(c echo.Context) error {
 	/*POST src = /user/admin/{adminID}/delete/{userID}*/
-	err := verifyAdmin(c)
+	err := middleware.VerifyAdmin(c)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -77,7 +52,7 @@ func AdminModifyUser(c echo.Context) error {
 	/*POST src = /user/admin/modify/:Uid with json containing key&value*/
 	inData := new(AdminModifyUserINData)
 	//验证身份
-	err := verifyAdmin(c)
+	err := middleware.VerifyAdmin(c)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),

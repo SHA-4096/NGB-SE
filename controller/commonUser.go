@@ -1,13 +1,13 @@
 package controller
 
 import (
+	"NGB-SE/middleware"
 	"NGB-SE/model"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
 	"net/http"
 	"reflect"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -59,7 +59,7 @@ func Login(c echo.Context) error {
 		}
 		return c.JSON(http.StatusUnauthorized, outData)
 	}
-	jwtToken, key, err := GetJwt(user.Uid)
+	jwtToken, key, err := middleware.GetJwt(user.Uid)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -68,7 +68,7 @@ func Login(c echo.Context) error {
 	}
 	user.JwtKey = key
 	model.DB.Save(&user)
-	refreshToken, err := GetRefreshJwt(user.Uid)
+	refreshToken, err := middleware.GetRefreshJwt(user.Uid)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -86,7 +86,7 @@ func Login(c echo.Context) error {
 
 func LogOut(c echo.Context) error {
 	/*GET src = /user/:Uid/logout with token*/
-	_, err := verifyUser(c, false)
+	_, err := middleware.VerifyUser(c, false)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -111,40 +111,9 @@ func LogOut(c echo.Context) error {
 	return c.JSON(http.StatusInternalServerError, outData)
 }
 
-func verifyUser(c echo.Context, isRefresh bool) (string, error) {
-	/*内部函数，用来验证用户,需要:Uid的路径参数以及token,会返回一个token和error*/
-	Uid := c.Param("Uid")
-	user := new(model.User)
-	model.DB.Where("Uid = ?", Uid).First(&user)
-	if user.Uid == "" {
-		return "", fmt.Errorf("您不是已注册用户")
-	}
-	tokenRaw := c.Request().Header.Get("Authorization")
-	token := (strings.Split(tokenRaw, " "))
-	if len(token) < 2 {
-		return "", fmt.Errorf("你没有在请求头携带token")
-	}
-	fmt.Println("TOKEN IS:", token[1])
-	var key string
-	if isRefresh {
-		key = refreshTokenKey
-	} else {
-		key = user.JwtKey
-	}
-
-	claims, err := DecodeJwt(token[1], key)
-	if err != nil {
-		return "", err
-	}
-	if claims["Uid"] != Uid {
-		return "", fmt.Errorf("你的token无效")
-	}
-	return token[1], nil
-}
-
 func DeleteUser(c echo.Context) error {
 	/*GET src = /user/delete/:Uid with token*/
-	_, err := verifyUser(c, false)
+	_, err := middleware.VerifyUser(c, false)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -170,7 +139,7 @@ func ModifyUser(c echo.Context) error {
 	/*POST src = /user/modify/:Uid with json containing key&value*/
 	inData := new(AdminModifyUserINData)
 	//验证用户
-	_, err := verifyUser(c, false)
+	_, err := middleware.VerifyUser(c, false)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -217,7 +186,7 @@ func ModifyUser(c echo.Context) error {
 func RenewWithRefreshToken(c echo.Context) error {
 	/*GET方法,更新jwtToken,src = /user/:Uid/refreshtoken,请求头携带refreshToken*/
 	//检查用户
-	refreshToken, err := verifyUser(c, true)
+	refreshToken, err := middleware.VerifyUser(c, true)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -234,7 +203,7 @@ func RenewWithRefreshToken(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, outData)
 	}
 	//分发新的token
-	jwtToken, key, err := GetJwt(user.Uid)
+	jwtToken, key, err := middleware.GetJwt(user.Uid)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
