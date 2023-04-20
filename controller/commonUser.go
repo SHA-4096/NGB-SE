@@ -3,8 +3,6 @@ package controller
 import (
 	"NGB-SE/middleware"
 	"NGB-SE/model"
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -16,20 +14,14 @@ type LogOutInData struct {
 	Uid string
 }
 
-func encodeMethod(input string) string {
-	hash := md5.Sum([]byte(input))
-	return hex.EncodeToString(hash[:])
-}
-
 func Register(c echo.Context) error {
 	/*POST Uid;Name;Password*/
 	//检查id是否被使用
 	user := new(model.User)
-	checkUser := new(model.User)
 	if err := c.Bind(user); err != nil {
 		return err
 	}
-	err := model.DB.Where("Uid = ?", user.Uid).First(&checkUser).Error
+	_, err := model.QueryUid(user.Uid)
 	if err == nil {
 		outData := map[string]interface{}{
 			"message": "这个用户id已经被占用了哦",
@@ -38,8 +30,8 @@ func Register(c echo.Context) error {
 
 	}
 	user.IsAdmin = "False"
-	user.Password = encodeMethod(user.Password)
-	model.DB.Create(&user)
+	user.Password = middleware.EncodeMethod(user.Password)
+	model.CreateUser(user)
 
 	data := map[string]interface{}{
 		"message": "注册成功",
@@ -51,9 +43,8 @@ func Login(c echo.Context) error {
 	/*POST Uid;Password*/
 	inData := new(model.User)
 	c.Bind(inData)
-	var user model.User
-	model.DB.Where("Uid = ? AND Password= ?", inData.Uid, encodeMethod(inData.Password)).First(&user)
-	if user.Uid == "" {
+	user, err := model.QueryUidAndPassword(inData.Uid, middleware.EncodeMethod(inData.Password))
+	if err != nil {
 		outData := map[string]interface{}{
 			"message": "帐号不存在或密码错误",
 		}
@@ -67,7 +58,7 @@ func Login(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, outData)
 	}
 	user.JwtKey = key
-	model.DB.Save(&user)
+	model.SaveUser(user)
 	refreshToken, err := middleware.GetRefreshJwt(user.Uid)
 	if err != nil {
 		outData := map[string]interface{}{
@@ -94,8 +85,7 @@ func LogOut(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, outData)
 	}
 	//从数据库里面取出用户
-	user := new(model.User)
-	err = model.DB.Where("Uid = ?", c.Param("Uid")).First(&user).Error
+	user, err := model.QueryUid(c.Param("Uid"))
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -104,7 +94,7 @@ func LogOut(c echo.Context) error {
 	}
 	//注销用户
 	user.JwtKey = ""
-	model.DB.Save(&user)
+	model.SaveUser(user)
 	outData := map[string]interface{}{
 		"message": fmt.Sprintf("用户%s已经注销", c.Param("Uid")),
 	}
@@ -120,7 +110,7 @@ func DeleteUser(c echo.Context) error {
 		}
 		return c.JSON(http.StatusUnauthorized, outData)
 	}
-	err = model.DB.Where("Uid = ?", c.Param("Uid")).Delete(&model.User{}).Error
+	err = model.DeleteUid(c.Param("Uid"))
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -154,8 +144,7 @@ func ModifyUser(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, outData)
 	}
-	user := new(model.User)
-	err = model.DB.Where("Uid = ?", c.Param("Uid")).First(&user).Error
+	user, err := model.QueryUid(c.Param("Uid"))
 	//查询出错时
 	if user.Uid == "" {
 		outData := map[string]interface{}{
@@ -169,7 +158,7 @@ func ModifyUser(c echo.Context) error {
 	fieldValue := refUser.FieldByName(inData.Key)
 	if fieldValue.IsValid() {
 		fieldValue.SetString(inData.Value)
-		model.DB.Save(&user)
+		model.SaveUser(user)
 		outData := map[string]interface{}{
 			"message": fmt.Sprintf("用户%s的%s值被修改为%s", c.Param("Uid"), inData.Key, inData.Value),
 		}
@@ -194,8 +183,7 @@ func RenewWithRefreshToken(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, outData)
 	}
 
-	user := new(model.User)
-	err = model.DB.Where("Uid = ?", c.Param("Uid")).First(&user).Error
+	user, err := model.QueryUid(c.Param("Uid"))
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -211,7 +199,7 @@ func RenewWithRefreshToken(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, outData)
 	}
 	user.JwtKey = key
-	model.DB.Save(&user)
+	model.SaveUser(user)
 	outData := map[string]interface{}{
 		"jwtToken":     jwtToken,
 		"refreshToken": refreshToken,

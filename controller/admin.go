@@ -25,15 +25,7 @@ func AdminDeleteUser(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, outData)
 	}
 	//检查要删除的用户是否存在
-	user := new(model.User)
-	err = model.DB.Where("Uid = ?", c.Param("Uid")).First(&user).Error
-	if err != nil {
-		outData := map[string]interface{}{
-			"message": err.Error(),
-		}
-		return c.JSON(http.StatusInternalServerError, outData)
-	}
-	err = model.DB.Where("Uid = ?", c.Param("Uid")).Delete(&model.User{}).Error
+	err = model.DeleteUid(c.Param("Uid"))
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": "找不到用户",
@@ -67,8 +59,7 @@ func AdminModifyUser(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, outData)
 	}
-	user := new(model.User)
-	err = model.DB.Where("Uid = ?", c.Param("Uid")).First(&user).Error
+	user, err := model.QueryUid(c.Param("Uid"))
 	//查询出错时
 	if user.Uid == "" {
 		outData := map[string]interface{}{
@@ -82,7 +73,7 @@ func AdminModifyUser(c echo.Context) error {
 	fieldValue := refUser.FieldByName(inData.Key)
 	if fieldValue.IsValid() {
 		fieldValue.SetString(inData.Value)
-		model.DB.Save(&user)
+		model.SaveUser(user)
 		outData := map[string]interface{}{
 			"message": fmt.Sprintf("用户%s的%s值被修改为%s", c.Param("Uid"), inData.Key, inData.Value),
 		}

@@ -2,6 +2,8 @@ package middleware
 
 import (
 	"NGB-SE/model"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"strings"
 
@@ -11,9 +13,8 @@ import (
 func VerifyUser(c echo.Context, isRefresh bool) (string, error) {
 	/*内部函数，用来验证用户,需要:Uid的路径参数以及token,会返回一个token和error*/
 	Uid := c.Param("Uid")
-	user := new(model.User)
-	model.DB.Where("Uid = ?", Uid).First(&user)
-	if user.Uid == "" {
+	user, err := model.QueryUid(Uid)
+	if err != nil {
 		return "", fmt.Errorf("您不是已注册用户")
 	}
 	tokenRaw := c.Request().Header.Get("Authorization")
@@ -41,7 +42,6 @@ func VerifyUser(c echo.Context, isRefresh bool) (string, error) {
 
 func VerifyAdmin(c echo.Context) error {
 	AdminId := c.Param("AdminId")
-	user := new(model.User)
 	tokenRaw := c.Request().Header.Get("Authorization")
 	token := (strings.Split(tokenRaw, " "))
 	if len(token) < 2 {
@@ -49,7 +49,10 @@ func VerifyAdmin(c echo.Context) error {
 	}
 	fmt.Println("TOKEN IS:", token[1])
 	//检查管理员身份
-	model.DB.Where("Uid = ?", AdminId).First(&user)
+	user, err := model.QueryUid(AdminId)
+	if err != nil {
+		return err
+	}
 	key := user.JwtKey
 	claims, err := DecodeJwt(token[1], key)
 	if err != nil {
@@ -62,4 +65,9 @@ func VerifyAdmin(c echo.Context) error {
 		return fmt.Errorf("你不是管理员")
 	}
 	return nil
+}
+
+func EncodeMethod(input string) string {
+	hash := md5.Sum([]byte(input))
+	return hex.EncodeToString(hash[:])
 }

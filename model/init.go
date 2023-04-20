@@ -16,7 +16,7 @@ func migrate(db *gorm.DB) error {
 	return nil
 }
 
-var DB *gorm.DB
+var db *gorm.DB
 var err error
 
 func init() {
@@ -24,11 +24,11 @@ func init() {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local&timeout=%s", config.DataBase.UserName, config.DataBase.PassWord, config.DataBase.Host, config.DataBase.Port, config.DataBase.DbName, config.DataBase.TimeOut)
 	fmt.Println(dsn)
 	//连接MYSQL, 获得DB类型实例，用于后面的数据库读写操作。
-	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("连接数据库失败, error=" + err.Error())
 	}
-	err = migrate(DB)
+	err = migrate(db)
 	if err != nil {
 		panic(err)
 	}
