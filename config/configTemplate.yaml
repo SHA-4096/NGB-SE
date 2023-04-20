@@ -6,3 +6,6 @@ DataBase:
   port: "3306"
   dbName: "YourDbName"
   timeout: "10s"
+
+JWTConfig:
+  refreshTokenKey: "YourRefreshTokenKey"
