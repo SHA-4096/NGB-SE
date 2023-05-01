@@ -8,8 +8,15 @@ import (
 	"gorm.io/gorm"
 )
 
+//
+//迁移
+//
 func migrate(db *gorm.DB) error {
 	err := db.AutoMigrate(&User{})
+	if err != nil {
+		return err
+	}
+	err = db.AutoMigrate(&Nodes{})
 	if err != nil {
 		return err
 	}
