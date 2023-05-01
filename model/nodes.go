@@ -19,7 +19,7 @@ func CreateNode(Receiver *Nodes) error {
 //
 func DeleteNode(NodeId string) error {
 	var node Nodes
-	err := db.Where("SelfId = ?", NodeId).First(&nodes).Error
+	err := db.Where("SelfId = ?", NodeId).First(&node).Error
 	if err != nil {
 		return err
 	}
