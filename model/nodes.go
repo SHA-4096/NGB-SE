@@ -69,3 +69,16 @@ func GetNodeName(nodeId string) (string, error) {
 	}
 	return nodes.NodeName, nil
 }
+
+func GetAllZones() ([]Nodes, error) {
+	var nodes []Nodes
+	db.Find(&nodes, "node_type = ?", "zone")
+	return nodes, nil
+
+}
+
+func GetAllPassageByZones(zoneId string) ([]Nodes, error) {
+	var nodes []Nodes
+	db.Find(&nodes, "node_type = ? AND father_node_id = ?", "passage", zoneId)
+	return nodes, nil
+}

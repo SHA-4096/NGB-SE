@@ -19,4 +19,6 @@ func SetRouters(e *echo.Echo) {
 	//节点管理部分
 	e.POST("/nodes/:Uid/create/zone", controller.CreateZone)
 	e.POST("/nodes/:Uid/create/passage", controller.CreatePassage)
+	e.GET("/nodes/get/zones", controller.QueryAllZones)
+	e.GET("/nodes/get/passages/:ZoneId", controller.QueryAllPassageByZoneId)
 }

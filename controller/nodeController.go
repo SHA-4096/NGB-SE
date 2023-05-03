@@ -19,6 +19,13 @@ type ZoneNameStruct struct {
 	ZoneName string
 }
 
+type PassageStruct struct {
+	PassageId      string
+	PassageContent string
+	BelongZoneName string
+	BelongZoneId   string
+}
+
 //
 //新建分区 POST方法，要求有token,json携带ZoneName
 //src = /nodes/:Uid/create/zone
@@ -94,4 +101,52 @@ func CreatePassage(c echo.Context) error {
 		"ZoneName":  zoneName,
 	}
 	return c.JSON(http.StatusOK, outData)
+}
+
+//
+//GET src = /nodes/get/zones
+//返回所有的分区id和名称
+//
+func QueryAllZones(c echo.Context) error {
+	res, err := model.GetAllZones()
+	zones := []ZoneNameStruct{}
+	if err != nil {
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
+	}
+	//得到的数据里面提取出ZoneId和ZoneName
+	for _, nodes := range res {
+		var tempZone ZoneNameStruct
+		tempZone.ZoneId = nodes.SelfId
+		tempZone.ZoneName = nodes.NodeName
+		zones = append(zones, tempZone)
+	}
+	return c.JSON(http.StatusOK, zones)
+}
+
+//
+//GET src = /nodes/get/passages/:ZoneId
+//返回所有的分区id和名称
+//
+func QueryAllPassageByZoneId(c echo.Context) error {
+	res, err := model.GetAllPassageByZones(c.Param("ZoneId"))
+	passages := []PassageStruct{}
+	if err != nil {
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
+	}
+	//得到的数据里面提取出PassageId和Content
+	for _, nodes := range res {
+		var tempPassage PassageStruct
+		tempPassage.PassageId = nodes.SelfId
+		tempPassage.PassageContent = nodes.Content
+		tempPassage.BelongZoneId = nodes.FatherNodeId
+		tempPassage.BelongZoneName, _ = model.GetNodeName(nodes.FatherNodeId)
+		passages = append(passages, tempPassage)
+	}
+	return c.JSON(http.StatusOK, passages)
 }
