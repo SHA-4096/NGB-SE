@@ -42,18 +42,30 @@ func DeleteNode(NodeId string) error {
 //
 func GetRandomId() string {
 	rand.Seed(time.Now().Unix())
-	randomID := rand.Int()
+	randomId := rand.Int()
 	var nodes Nodes
 	for {
-		err = db.Where("SelfId = ?", randomID).First(&nodes).Error
-		if err != nil {
+		err = db.Where("SelfId = ?", randomId).First(&nodes).Error
+		if err == nil { //若这个id已经存在
 			rand.Seed(time.Now().Unix())
-			randomID = rand.Int()
+			randomId = rand.Int()
 		} else {
 			break
 		}
 
 	}
-	return fmt.Sprintf("%d", randomID)
+	return fmt.Sprintf("%d", randomId)
 
+}
+
+//
+//查询一个nodeId对应的node名称
+//
+func GetNodeName(nodeId string) (string, error) {
+	var nodes Nodes
+	err = db.Where("SelfId = ?", nodeId).First(&nodes).Error
+	if err != nil {
+		return "", fmt.Errorf("这个id不存在")
+	}
+	return nodes.NodeName, nil
 }

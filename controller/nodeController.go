@@ -10,6 +10,7 @@ import (
 
 type CreateNodeInData struct {
 	ZoneName string
+	ZoneId   string
 	Content  string
 }
 
@@ -31,12 +32,24 @@ func CreateZone(c echo.Context) error {
 	node.AuthorId = c.Param("Uid")
 	node.NodeType = "zone"
 	node.SelfId = model.GetRandomId()
-	model.CreateNode(&node)
-
+	node.NodeName = inData.ZoneName
+	err = model.CreateNode(&node)
+	if err != nil {
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
+	}
+	outData := map[string]interface{}{
+		"message": "分区创建成功",
+		"ZoneId:": node.SelfId,
+	}
+	return c.JSON(http.StatusOK, outData)
 }
 
 //
-//新建分区 POST方法，要求有token,json携带Content,ZoneName
+//新建分区 POST方法，要求有token,json携带Content,ZoneId
+//返回PassageId和ZoneId
 //src = /nodes/:Uid/Create/passage
 //
 func CreatePassage(c echo.Context) error {
@@ -49,4 +62,24 @@ func CreatePassage(c echo.Context) error {
 		}
 		return c.JSON(http.StatusUnauthorized, outData)
 	}
+	var node model.Nodes
+	node.AuthorId = c.Param("Uid")
+	node.NodeType = "passage"
+	node.Content = inData.Content
+	node.FatherNodeId = inData.ZoneId
+	node.SelfId = model.GetRandomId()
+	zoneName, err := model.GetNodeName(inData.ZoneId)
+	if err != nil {
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
+
+	}
+	outData := map[string]interface{}{
+		"message":   "分区创建成功",
+		"PassageId": node.SelfId,
+		"ZoneName":  zoneName,
+	}
+	return c.JSON(http.StatusOK, outData)
 }
