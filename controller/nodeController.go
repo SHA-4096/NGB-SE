@@ -14,9 +14,14 @@ type CreateNodeInData struct {
 	Content  string
 }
 
+type ZoneNameStruct struct {
+	ZoneId   string
+	ZoneName string
+}
+
 //
 //新建分区 POST方法，要求有token,json携带ZoneName
-//src = /nodes/:Uid/Create/Zone
+//src = /nodes/:Uid/create/zone
 //
 func CreateZone(c echo.Context) error {
 	inData := new(CreateNodeInData)
@@ -50,7 +55,7 @@ func CreateZone(c echo.Context) error {
 //
 //新建分区 POST方法，要求有token,json携带Content,ZoneId
 //返回PassageId和ZoneId
-//src = /nodes/:Uid/Create/passage
+//src = /nodes/:Uid/create/passage
 //
 func CreatePassage(c echo.Context) error {
 	inData := new(CreateNodeInData)
@@ -75,6 +80,13 @@ func CreatePassage(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, outData)
 
+	}
+	err = model.CreateNode(&node)
+	if err != nil {
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
 	}
 	outData := map[string]interface{}{
 		"message":   "分区创建成功",

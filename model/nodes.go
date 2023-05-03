@@ -19,20 +19,20 @@ func CreateNode(Receiver *Nodes) error {
 //
 func DeleteNode(NodeId string) error {
 	var node Nodes
-	err := db.Where("SelfId = ?", NodeId).First(&node).Error
+	err := db.Where("self_id = ?", NodeId).First(&node).Error
 	if err != nil {
 		return err
 	}
 	if node.NodeType == "passage" {
 		/*节点类型为帖子(passage)的时候直接删除*/
-		err = db.Where("SelfId = ?", NodeId).Delete(&User{}).Error
+		err = db.Where("self_id = ?", NodeId).Delete(&User{}).Error
 	} else {
 		/*节点类型为分区(zone)的时候删除其下的所有passage以及节点本身*/
-		err = db.Where("FatherId = ?", NodeId).Delete(&User{}).Error
+		err = db.Where("father_id = ?", NodeId).Delete(&User{}).Error
 		if err != nil {
 			return err
 		}
-		err = db.Where("SelfId = ?", NodeId).Delete(&User{}).Error
+		err = db.Where("self_id = ?", NodeId).Delete(&User{}).Error
 	}
 	return err
 }
@@ -45,7 +45,7 @@ func GetRandomId() string {
 	randomId := rand.Int()
 	var nodes Nodes
 	for {
-		err = db.Where("SelfId = ?", randomId).First(&nodes).Error
+		err = db.Where("self_id= ?", randomId).First(&nodes).Error
 		if err == nil { //若这个id已经存在
 			rand.Seed(time.Now().Unix())
 			randomId = rand.Int()
@@ -63,7 +63,7 @@ func GetRandomId() string {
 //
 func GetNodeName(nodeId string) (string, error) {
 	var nodes Nodes
-	err = db.Where("SelfId = ?", nodeId).First(&nodes).Error
+	err = db.Where("self_id = ?", nodeId).First(&nodes).Error
 	if err != nil {
 		return "", fmt.Errorf("这个id不存在")
 	}
