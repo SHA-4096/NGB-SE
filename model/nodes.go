@@ -33,14 +33,14 @@ func DeleteNode(NodeId string) error {
 	}
 	if node.NodeType == "passage" {
 		/*节点类型为帖子(passage)的时候直接删除*/
-		err = db.Where("self_id = ?", NodeId).Delete(&User{}).Error
+		err = db.Where("self_id = ?", NodeId).Delete(&Nodes{}).Error
 	} else {
 		/*节点类型为分区(zone)的时候删除其下的所有passage以及节点本身*/
-		err = db.Where("father_id = ?", NodeId).Delete(&User{}).Error
+		err = db.Where("father_id = ?", NodeId).Delete(&Nodes{}).Error
 		if err != nil {
 			return err
 		}
-		err = db.Where("self_id = ?", NodeId).Delete(&User{}).Error
+		err = db.Where("self_id = ?", NodeId).Delete(&Nodes{}).Error
 	}
 	return err
 }

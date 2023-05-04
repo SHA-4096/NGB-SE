@@ -82,11 +82,54 @@ func CreatePassage(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, outData)
 	}
 	outData := map[string]interface{}{
-		"message":   "分区创建成功",
+		"message":   "文章创建成功",
 		"PassageId": node.SelfId,
 		"ZoneName":  zoneName,
+		"AuthorId":  node.AuthorId,
 	}
 	return c.JSON(http.StatusOK, outData)
+}
+
+//
+//GET src = /nodes/:Uid/delete/passage/:PassageId
+//给用户删除自己的文章，需要token
+//
+func DeletePassageCommonUser(c echo.Context) error {
+	//用户验证
+	tokenRaw := c.Request().Header.Get("Authorization")
+	_, err := middleware.VerifyUser(c.Param("Uid"), tokenRaw, false)
+	if err != nil {
+		msg := MsgStruct{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusUnauthorized, msg)
+	}
+	node, err := model.GetSingleNode(c.Param("PassageId"))
+	if err != nil {
+		msg := MsgStruct{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, msg)
+	}
+	//确保是用户删除自己发的帖子
+	if node.NodeType == "zone" || node.AuthorId != c.Param("Uid") {
+		msg := MsgStruct{
+			Message: "这个请求非法",
+		}
+		return c.JSON(http.StatusUnauthorized, msg)
+	}
+	err = model.DeleteNode(c.Param("PassageId"))
+	if err != nil {
+		msg := MsgStruct{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, msg)
+	}
+	msg := MsgStruct{
+		Message: "删除文章成功",
+	}
+	return c.JSON(http.StatusOK, msg)
+
 }
 
 //
