@@ -77,7 +77,8 @@ func Login(c echo.Context) error {
 
 func LogOut(c echo.Context) error {
 	/*GET src = /user/:Uid/logout with token*/
-	_, err := middleware.VerifyUser(c, false)
+	tokenRaw := c.Request().Header.Get("Authorization")
+	_, err := middleware.VerifyUser(c.Param("Uid"), tokenRaw, false)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -103,7 +104,8 @@ func LogOut(c echo.Context) error {
 
 func DeleteUser(c echo.Context) error {
 	/*GET src = /user/delete/:Uid with token*/
-	_, err := middleware.VerifyUser(c, false)
+	tokenRaw := c.Request().Header.Get("Authorization")
+	_, err := middleware.VerifyUser(c.Param("Uid"), tokenRaw, false)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -129,7 +131,8 @@ func ModifyUser(c echo.Context) error {
 	/*POST src = /user/modify/:Uid with json containing key&value*/
 	inData := new(AdminModifyUserINData)
 	//验证用户
-	_, err := middleware.VerifyUser(c, false)
+	tokenRaw := c.Request().Header.Get("Authorization")
+	_, err := middleware.VerifyUser(c.Param("Uid"), tokenRaw, false)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -175,7 +178,8 @@ func ModifyUser(c echo.Context) error {
 func RenewWithRefreshToken(c echo.Context) error {
 	/*GET方法,更新jwtToken,src = /user/:Uid/refreshtoken,请求头携带refreshToken*/
 	//检查用户
-	refreshToken, err := middleware.VerifyUser(c, true)
+	tokenRaw := c.Request().Header.Get("Authorization")
+	refreshToken, err := middleware.VerifyUser(c.Param("Uid"), tokenRaw, true)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),

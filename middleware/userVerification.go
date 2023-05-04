@@ -6,18 +6,14 @@ import (
 	"encoding/hex"
 	"fmt"
 	"strings"
-
-	"github.com/labstack/echo/v4"
 )
 
-func VerifyUser(c echo.Context, isRefresh bool) (string, error) {
+func VerifyUser(Uid, tokenRaw string, isRefresh bool) (string, error) {
 	/*内部函数，用来验证用户,需要:Uid的路径参数以及token,会返回一个token和error*/
-	Uid := c.Param("Uid")
 	user, err := model.QueryUid(Uid)
 	if err != nil {
 		return "", fmt.Errorf("您不是已注册用户")
 	}
-	tokenRaw := c.Request().Header.Get("Authorization")
 	token := (strings.Split(tokenRaw, " "))
 	if len(token) < 2 {
 		return "", fmt.Errorf("你没有在请求头携带token")
@@ -40,9 +36,7 @@ func VerifyUser(c echo.Context, isRefresh bool) (string, error) {
 	return token[1], nil
 }
 
-func VerifyAdmin(c echo.Context) error {
-	AdminId := c.Param("AdminId")
-	tokenRaw := c.Request().Header.Get("Authorization")
+func VerifyAdmin(AdminId, tokenRaw string) error {
 	token := (strings.Split(tokenRaw, " "))
 	if len(token) < 2 {
 		return fmt.Errorf("你没有在请求头携带token")

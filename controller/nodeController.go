@@ -33,7 +33,8 @@ type PassageStruct struct {
 func CreateZone(c echo.Context) error {
 	inData := new(CreateNodeInData)
 	c.Bind(inData)
-	err := middleware.VerifyAdmin(c)
+	tokenRaw := c.Request().Header.Get("Authorization")
+	err := middleware.VerifyAdmin(c.Param("AdminId"), tokenRaw)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -68,7 +69,8 @@ func CreateZone(c echo.Context) error {
 func CreatePassage(c echo.Context) error {
 	inData := new(CreateNodeInData)
 	c.Bind(inData)
-	_, err := middleware.VerifyUser(c, false)
+	tokenRaw := c.Request().Header.Get("Authorization")
+	_, err := middleware.VerifyUser(c.Param("Uid"), tokenRaw, false)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),

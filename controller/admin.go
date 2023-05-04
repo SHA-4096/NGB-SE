@@ -17,7 +17,8 @@ type AdminModifyUserINData struct {
 
 func AdminDeleteUser(c echo.Context) error {
 	/*POST src = /user/admin/{adminID}/delete/{userID}*/
-	err := middleware.VerifyAdmin(c)
+	tokenRaw := c.Request().Header.Get("Authorization")
+	err := middleware.VerifyAdmin(c.Param("AdminId"), tokenRaw)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -41,10 +42,11 @@ func AdminDeleteUser(c echo.Context) error {
 }
 
 func AdminModifyUser(c echo.Context) error {
-	/*POST src = /user/admin/modify/:Uid with json containing key&value*/
+	/*POST src = /user/:AdminId/modify/:Uid with json containing key&value*/
 	inData := new(AdminModifyUserINData)
 	//验证身份
-	err := middleware.VerifyAdmin(c)
+	tokenRaw := c.Request().Header.Get("Authorization")
+	err := middleware.VerifyAdmin(c.Param("AdminId"), tokenRaw)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
