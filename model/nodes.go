@@ -15,6 +15,14 @@ func CreateNode(Receiver *Nodes) error {
 }
 
 //
+//保存对节点的修改
+//
+func SaveNode(Receiver *Nodes) error {
+	err := db.Save(&Receiver).Error
+	return err
+}
+
+//
 //删除节点
 //
 func DeleteNode(NodeId string) error {
@@ -70,6 +78,9 @@ func GetNodeName(nodeId string) (string, error) {
 	return nodes.NodeName, nil
 }
 
+//
+//查询所有分区
+//
 func GetAllZones() ([]Nodes, error) {
 	var nodes []Nodes
 	db.Find(&nodes, "node_type = ?", "zone")
@@ -77,8 +88,20 @@ func GetAllZones() ([]Nodes, error) {
 
 }
 
+//
+//获得zoneId对应分区下面的所有文章
+//
 func GetAllPassageByZones(zoneId string) ([]Nodes, error) {
 	var nodes []Nodes
 	db.Find(&nodes, "node_type = ? AND father_node_id = ?", "passage", zoneId)
 	return nodes, nil
+}
+
+//
+//根据nodeId返回一个node结构体
+//
+func GetSingleNode(nodeId string) (Nodes, error) {
+	var node Nodes
+	err := db.Where("self_id = ?", nodeId).First(&node).Error
+	return node, err
 }

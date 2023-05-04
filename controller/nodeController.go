@@ -3,28 +3,11 @@ package controller
 import (
 	"NGB-SE/middleware"
 	"NGB-SE/model"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
-
-type CreateNodeInData struct {
-	ZoneName string
-	ZoneId   string
-	Content  string
-}
-
-type ZoneNameStruct struct {
-	ZoneId   string
-	ZoneName string
-}
-
-type PassageStruct struct {
-	PassageId      string
-	PassageContent string
-	BelongZoneName string
-	BelongZoneId   string
-}
 
 //
 //新建分区 POST方法，要求有token,json携带ZoneName
@@ -152,4 +135,38 @@ func QueryAllPassageByZoneId(c echo.Context) error {
 		passages = append(passages, tempPassage)
 	}
 	return c.JSON(http.StatusOK, passages)
+}
+
+//
+//GET src = /view/passage/:PassageId/user/:Uid/like
+//用户的点赞功能，需要token
+//
+func LikePassage(c echo.Context) error {
+	tokenRaw := c.Request().Header.Get("Authorization")
+	_, err := middleware.VerifyUser(c.Param("Uid"), tokenRaw, false)
+	if err != nil {
+		errMsg := MsgStruct{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusUnauthorized, errMsg)
+	}
+	node, err := model.GetSingleNode(c.Param("PassageId"))
+	if err != nil {
+		msg := MsgStruct{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, msg)
+	}
+	if node.NodeType == "zone" {
+		msg := MsgStruct{
+			Message: "这是一个分区而不是文章",
+		}
+		return c.JSON(http.StatusBadRequest, msg) //这里不确定是不是BadRequest
+	}
+	node.Likes++
+	model.SaveNode(&node)
+	msg := MsgStruct{
+		Message: fmt.Sprintf("点赞成功，现在文章%s有%d个赞", c.Param("PassageId"), node.Likes),
+	}
+	return c.JSON(http.StatusOK, msg)
 }
