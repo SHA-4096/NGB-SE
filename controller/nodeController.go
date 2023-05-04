@@ -33,7 +33,7 @@ type PassageStruct struct {
 func CreateZone(c echo.Context) error {
 	inData := new(CreateNodeInData)
 	c.Bind(inData)
-	_, err := middleware.VerifyUser(c, false)
+	err := middleware.VerifyAdmin(c)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
@@ -61,6 +61,7 @@ func CreateZone(c echo.Context) error {
 
 //
 //新建分区 POST方法，要求有token,json携带Content,ZoneId
+//需要管理员权限
 //返回PassageId和ZoneId
 //src = /nodes/:Uid/create/passage
 //
