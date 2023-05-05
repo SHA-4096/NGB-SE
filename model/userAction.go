@@ -34,3 +34,16 @@ func DeleteLike(Uid string, PassageId string) error {
 	}
 	return nil
 }
+
+func CreateFirendRequest(Uid, FriendId string) error {
+	var friendAction FriendAction
+	err := db.Where("uid = ? AND target_id = ?", Uid, FriendId).First(&friendAction).Error
+	if err == nil {
+		return fmt.Errorf("你已经发出了请求")
+	}
+	err = db.Where("uid = ? AND target_id = ?", FriendId, Uid).First(&friendAction).Error
+	if err == nil {
+		return fmt.Errorf("对方已经发出了请求")
+	}
+	return nil
+}
