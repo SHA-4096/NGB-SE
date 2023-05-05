@@ -185,6 +185,7 @@ func QueryAllPassageByZoneId(c echo.Context) error {
 //用户的点赞功能，需要token
 //
 func LikePassage(c echo.Context) error {
+	//用户认证部分
 	tokenRaw := c.Request().Header.Get("Authorization")
 	_, err := middleware.VerifyUser(c.Param("Uid"), tokenRaw, false)
 	if err != nil {
@@ -193,6 +194,7 @@ func LikePassage(c echo.Context) error {
 		}
 		return c.JSON(http.StatusUnauthorized, errMsg)
 	}
+	//查找文章是否存在
 	node, err := model.GetSingleNode(c.Param("PassageId"))
 	if err != nil {
 		msg := MsgStruct{
@@ -206,6 +208,15 @@ func LikePassage(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, msg) //这里不确定是不是BadRequest
 	}
+	//处理点赞记录
+	err = model.CreateLike(c.Param("Uid"), c.Param("PassageId"))
+	if err != nil {
+		msg := MsgStruct{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, msg)
+	}
+	//改变点赞数量
 	node.Likes++
 	model.SaveNode(&node)
 	msg := MsgStruct{

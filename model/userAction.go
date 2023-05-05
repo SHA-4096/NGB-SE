@@ -21,7 +21,7 @@ func CreateLike(Uid string, PassageId string) error {
 		//找不到记录
 		action.Uid = Uid
 		action.PassageId = PassageId
-		db.Save(&action)
+		db.Create(&action)
 		return nil
 	}
 	return fmt.Errorf("这条点赞记录已经存在")
