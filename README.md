@@ -15,13 +15,15 @@ Tree
 |   ├──userVerification.go
 ├──model
 |   ├──connectMysql.go
+|   ├──message.go
+|   ├──messageModel.go
 |   ├──nodes.go
 |   ├──nodesModel.go
 |   ├──toolFunc.go
 |   ├──userAccount.go
 |   ├──userAccountModel.go
-|   ├──userAction.go
-|   ├──userActionModel.go
+|   ├──userRelation.go
+|   ├──userRelationModel.go
 ├──view
 |   ├──router.go
 ├──API.yaml
