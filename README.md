@@ -20,6 +20,8 @@ Tree
 |   ├──toolFunc.go
 |   ├──userAccount.go
 |   ├──userAccountModel.go
+|   ├──userAction.go
+|   ├──userActionModel.go
 ├──view
 |   ├──router.go
 ├──API.yaml
