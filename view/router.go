@@ -21,6 +21,8 @@ func SetRouters(e *echo.Echo) {
 	e.POST("/nodes/:Uid/create/passage", controller.CreatePassage)
 	e.GET("/nodes/get/zones", controller.QueryAllZones)
 	e.GET("/nodes/get/passages/:ZoneId", controller.QueryAllPassageByZoneId)
-	e.GET("/view/passage/:PassageId/user/:Uid/like", controller.LikePassage)
 	e.GET("/nodes/:Uid/delete/passage/:PassageId", controller.DeletePassageCommonUser)
+	//用户操作管理部分
+	e.GET("/view/passage/:PassageId/user/:Uid/like", controller.LikePassage)
+	e.GET("/view/:Uid/likes/:FriendId", controller.QueryAllLikes)
 }

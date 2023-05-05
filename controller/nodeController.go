@@ -9,6 +9,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+/*-------------------------------------节点管理功能-------------------------------------*/
+
 //
 //新建分区 POST方法，要求有token,json携带ZoneName
 //src = /nodes/:Uid/create/zone
@@ -180,6 +182,8 @@ func QueryAllPassageByZoneId(c echo.Context) error {
 	return c.JSON(http.StatusOK, passages)
 }
 
+/*--------------------------------点赞相关功能----------------------------------*/
+
 //
 //GET src = /view/passage/:PassageId/user/:Uid/like
 //用户的点赞功能，需要token
@@ -223,4 +227,27 @@ func LikePassage(c echo.Context) error {
 		Message: fmt.Sprintf("点赞成功，现在文章%s有%d个赞", c.Param("PassageId"), node.Likes),
 	}
 	return c.JSON(http.StatusOK, msg)
+}
+
+//
+//GET src = /view/:Uid/likes/:FriendId
+//需要token
+//
+func QueryAllLikes(c echo.Context) error {
+	tokenRaw := c.Request().Header.Get("Authorization")
+	_, err := middleware.VerifyUser(c.Param("Uid"), tokenRaw, false)
+	if err != nil {
+		msg := MsgStruct{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusUnauthorized, msg)
+	}
+	actions, err := model.GetAllLikes(c.Param("FriendId"))
+	if err != nil {
+		msg := MsgStruct{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, msg)
+	}
+	return c.JSON(http.StatusOK, actions)
 }
