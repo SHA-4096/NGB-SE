@@ -2,6 +2,12 @@ package model
 
 import "fmt"
 
+const (
+	//二进制状态码
+	StateFriend = 1 //1
+	StateFollow = 2 //10
+)
+
 //
 //查询用户点赞的所有文章节点记录
 //
@@ -74,4 +80,24 @@ func CreateFriendRelation(Uid, FriendId string) error {
 	friendRelation.TargetId = Uid
 	db.Create(&friendRelation)
 	return nil
+}
+
+//
+//获取用户的关系
+//返回一个二进制状态码
+//好友：1 关注：10
+//
+func GetUserRelation(Uid, TargetId string) (int, error) {
+	var userRelation UserRelation
+	returnState := 0
+	err := db.Where("uid = ? AND target_id = ? AND relation_type = ?", Uid, TargetId, "friend").First(&userRelation).Error
+	if err == nil {
+		returnState += StateFriend
+	}
+	err = db.Where("uid = ? AND target_id = ? AND relation_type = ?", Uid, TargetId, "follow").First(&userRelation).Error
+	if err == nil {
+		returnState += StateFollow
+	}
+	return returnState, nil
+
 }

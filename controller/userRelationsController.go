@@ -65,10 +65,21 @@ func AgreeFriendRequest(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, msg)
 	}
+	//确认两人此前不是好友
+	state, err := model.GetUserRelation(c.Param("Uid"), c.Param("FriendId"))
+	if state&model.StateFriend != 0 {
+		//此前已经是好友了
+		msg := MsgStruct{
+			Message: fmt.Sprintf("你和%s早就是好友了哦", c.Param("FriendId")),
+		}
+		return c.JSON(http.StatusOK, msg)
+	}
+	//此前不是好友
 	err = model.CreateFriendRelation(c.Param("Uid"), c.Param("FriendId"))
 	if err != nil {
 		return err
 	}
+
 	msg := MsgStruct{
 		Message: fmt.Sprintf("你和%s已经成为好友了", c.Param("FriendId")),
 	}
