@@ -28,6 +28,9 @@ func SetRouters(e *echo.Echo) {
 	//用户关系部分
 	e.GET("/relation/:Uid/mkfriend/:FriendId", controller.AddFriend)
 	e.GET("/relation/:Uid/agree/:FriendId", controller.AgreeFriendRequest)
+	e.GET("/relation/:Uid/mkfollow/:FollowId", controller.AddFollow)
+	e.GET("/relation/:Uid/unfollow/:FollowId", controller.UnFollow)
+	e.GET("/relation/query/follows/:Uid", controller.QueryAllFollows)
 	//消息处理部分
 	e.GET("/message/:Uid", controller.QueryMessage)
 }

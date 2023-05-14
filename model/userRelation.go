@@ -18,6 +18,15 @@ func GetAllLikes(Uid string) ([]LikeAction, error) {
 }
 
 //
+//查询用户关注列表
+//
+func GetAllFollows(Uid string) ([]UserRelation, error) {
+	var relations []UserRelation
+	db.Find(&relations, "uid = ? AND relation_type = ?", Uid, "follow")
+	return relations, nil
+}
+
+//
 //创建点赞记录
 //
 func CreateLike(Uid string, PassageId string) error {
@@ -69,6 +78,9 @@ func CheckFriendRequest(Uid, FriendId string) error {
 
 }
 
+//
+//创建好友关系
+//
 func CreateFriendRelation(Uid, FriendId string) error {
 	friendRelation := UserRelation{
 		Uid:          Uid,
@@ -80,6 +92,28 @@ func CreateFriendRelation(Uid, FriendId string) error {
 	friendRelation.TargetId = Uid
 	db.Create(&friendRelation)
 	return nil
+}
+
+//
+//创建关注关系
+//
+func CreateFollowRelation(Uid, FollowId string) error {
+	userRelation := UserRelation{
+		RelationType: "follow",
+		Uid:          Uid,
+		TargetId:     FollowId,
+	}
+	err := db.Create(&userRelation).Error
+	return err
+
+}
+
+//
+//
+//
+func DeleteFollowRelation(Uid, FollowId string) error {
+	err := db.Where("uid = ? AND target_id = ? AND relation_type = ?", Uid, FollowId, "follow").Delete(&UserRelation{}).Error
+	return err
 }
 
 //
