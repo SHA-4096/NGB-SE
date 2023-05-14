@@ -1,7 +1,7 @@
 package main
 
 import (
-	"NGB-SE/view"
+	"NGB-SE/internal/view"
 	"net/http"
 
 	"github.com/labstack/echo/v4"

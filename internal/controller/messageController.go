@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"NGB-SE/middleware"
-	"NGB-SE/model"
+	"NGB-SE/internal/middleware"
+	"NGB-SE/internal/model"
 	"net/http"
 
 	"github.com/labstack/echo/v4"

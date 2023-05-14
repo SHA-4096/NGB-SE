@@ -1,7 +1,7 @@
 package view
 
 import (
-	"NGB-SE/controller"
+	"NGB-SE/internal/controller"
 
 	"github.com/labstack/echo/v4"
 )

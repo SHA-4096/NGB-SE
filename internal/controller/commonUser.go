@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"NGB-SE/middleware"
-	"NGB-SE/model"
+	"NGB-SE/internal/middleware"
+	"NGB-SE/internal/model"
 	"fmt"
 	"net/http"
 	"reflect"

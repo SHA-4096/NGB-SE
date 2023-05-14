@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"NGB-SE/model"
+	"NGB-SE/internal/model"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"

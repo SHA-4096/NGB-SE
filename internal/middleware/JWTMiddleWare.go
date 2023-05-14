@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"NGB-SE/config"
+	config "NGB-SE/internal/conf"
 	"fmt"
 	"math/rand"
 	"time"
@@ -46,7 +46,7 @@ func GetJwt(Uid string) (string, string, error) {
 
 func GetRefreshJwt(Uid string) (string, error) {
 	//生成refreshToken
-	fmt.Println("RefreshTokenKeyIs", refreshTokenKey)
+	//fmt.Println("RefreshTokenKeyIs", refreshTokenKey)
 	refreshExpTime := time.Now().Add(time.Hour * refreshExpHours).Unix()
 	refreshClaims := jwt.MapClaims{}
 	refreshClaims["Uid"] = Uid
