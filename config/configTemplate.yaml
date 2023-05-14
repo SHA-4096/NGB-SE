@@ -9,3 +9,8 @@ DataBase:
 
 JWTConfig:
   refreshTokenKey: "YourRefreshTokenKey"
+
+LogConfig:
+  logPath: "YourLogPath"
+  rotateTime: 1 #更新文件时间，以分钟计
+  maxAge: 3 #最大记录时间，以分钟计

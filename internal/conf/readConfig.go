@@ -19,14 +19,22 @@ type jWTConfigStruct struct {
 	RefreshTokenKey string
 }
 
+type logConfigStruct struct {
+	LogPath    string
+	RotateTime int
+	MaxAge     int
+}
+
 var (
 	DataBase  *dataBaseStruct
 	JwtConfig *jWTConfigStruct
+	LogConfig *logConfigStruct
 )
 
 func init() {
 	DataBase = new(dataBaseStruct)
 	JwtConfig = new(jWTConfigStruct)
+	LogConfig = new(logConfigStruct)
 	//读取配置文件
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
@@ -44,6 +52,9 @@ func init() {
 	DataBase.DbName = viper.GetString("DataBase.dbName")
 	DataBase.TimeOut = viper.GetString("DataBase.timeout")
 	JwtConfig.RefreshTokenKey = viper.GetString("JwtConfig.refreshTokenKey")
+	LogConfig.LogPath = viper.GetString("LogConfig.logPath")
+	LogConfig.RotateTime = viper.GetInt("LogConfig.rotateTime")
+	LogConfig.MaxAge = viper.GetInt("LogConfig.maxAge")
 	if err != nil {
 		panic(err)
 	}

@@ -3,6 +3,7 @@ package controller
 import (
 	"NGB-SE/internal/middleware"
 	"NGB-SE/internal/model"
+	"NGB-SE/internal/util"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -17,14 +18,14 @@ type AdminModifyUserINData struct {
 }
 
 func AdminDeleteUser(c echo.Context) error {
-	/*POST src = /user/admin/{adminID}/delete/{userID}*/
+	/*POST src = /user/admin/{AdminId}/delete/{Uid}*/
 	tokenRaw := c.Request().Header.Get("Authorization")
-	err := middleware.VerifyAdmin(c.Param("AdminId"), tokenRaw)
+	err := middleware.VerifyAdmin(c.Param("AdminID"), tokenRaw)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
 		}
-		logrus.Info(fmt.Sprintf("未授权用户%s尝试使用管理员的删除用户方法", c.Param("adminId")))
+		logrus.Info(fmt.Sprintf("未授权用户%s尝试使用管理员的删除用户方法", c.Param("AdminId")))
 		return c.JSON(http.StatusUnauthorized, outData)
 	}
 	//检查要删除的用户是否存在
@@ -35,6 +36,7 @@ func AdminDeleteUser(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, outData)
 	} else {
+		logrus.Info(fmt.Sprintf("管理员%s删除了用户%s", c.Param("AdminId"), c.Param("Uid")))
 		outData := map[string]interface{}{
 			"message": fmt.Sprintf("用户%s已经删除", c.Param("Uid")),
 		}
@@ -50,6 +52,8 @@ func AdminModifyUser(c echo.Context) error {
 	tokenRaw := c.Request().Header.Get("Authorization")
 	err := middleware.VerifyAdmin(c.Param("AdminId"), tokenRaw)
 	if err != nil {
+		util.MakeInfoLog(fmt.Sprintf("未授权用户%s尝试使用管理员的修改用户方法", c.Param("AdminId")))
+		//		logrus.Info(fmt.Sprintf("未授权用户%s尝试使用管理员的修改用户方法", c.Param("AdminId")))
 		outData := map[string]interface{}{
 			"message": err.Error(),
 		}
@@ -72,12 +76,12 @@ func AdminModifyUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, outData)
 	}
 	//找到用户时
-	fmt.Print(inData)
 	refUser := reflect.ValueOf(user).Elem()
 	fieldValue := refUser.FieldByName(inData.Key)
 	if fieldValue.IsValid() {
 		fieldValue.SetString(inData.Value)
 		model.SaveUser(user)
+		logrus.Info(fmt.Sprintf("管理员%s修改了用户%s的信息，用户%s的%s值被修改为%s", c.Param("AdminId"), c.Param("Uid"), c.Param("Uid"), inData.Key, inData.Value))
 		outData := map[string]interface{}{
 			"message": fmt.Sprintf("用户%s的%s值被修改为%s", c.Param("Uid"), inData.Key, inData.Value),
 		}
