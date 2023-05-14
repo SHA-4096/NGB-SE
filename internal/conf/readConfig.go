@@ -31,7 +31,7 @@ func init() {
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	viper.SetConfigType("yaml")
-	file, err := os.Open("../config/config.yaml")
+	file, err := os.Open("config/config.yaml")
 	if err != nil {
 		panic(err)
 	}

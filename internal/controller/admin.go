@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
 type AdminModifyUserINData struct {
@@ -23,6 +24,7 @@ func AdminDeleteUser(c echo.Context) error {
 		outData := map[string]interface{}{
 			"message": err.Error(),
 		}
+		logrus.Info(fmt.Sprintf("未授权用户%s尝试使用管理员的删除用户方法", c.Param("adminId")))
 		return c.JSON(http.StatusUnauthorized, outData)
 	}
 	//检查要删除的用户是否存在
