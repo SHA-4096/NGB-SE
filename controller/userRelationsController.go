@@ -57,6 +57,14 @@ func AddFollow(c echo.Context) error {
 		}
 		return c.JSON(http.StatusUnauthorized, errMsg)
 	}
+	//检查要关注的用户是否存在
+	_, err = model.QueryUid(c.Param("FollowId"))
+	if err != nil {
+		errMsg := MsgStruct{
+			Message: "你要关注的用户不存在",
+		}
+		return c.JSON(http.StatusOK, errMsg)
+	}
 	//检查用户关系
 	relation, err := model.GetUserRelation(c.Param("Uid"), c.Param("FollowId"))
 	if err != nil {
@@ -94,6 +102,14 @@ func UnFollow(c echo.Context) error {
 			Message: err.Error(),
 		}
 		return c.JSON(http.StatusUnauthorized, errMsg)
+	}
+	//检查要关注的用户是否存在
+	_, err = model.QueryUid(c.Param("FollowId"))
+	if err != nil {
+		errMsg := MsgStruct{
+			Message: "你要取消关注的用户不存在",
+		}
+		return c.JSON(http.StatusOK, errMsg)
 	}
 	//检查用户关系
 	relation, err := model.GetUserRelation(c.Param("Uid"), c.Param("FollowId"))

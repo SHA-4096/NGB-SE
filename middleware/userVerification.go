@@ -18,7 +18,7 @@ func VerifyUser(Uid, tokenRaw string, isRefresh bool) (string, error) {
 	if len(token) < 2 {
 		return "", fmt.Errorf("你没有在请求头携带token")
 	}
-	fmt.Println("TOKEN IS:", token[1])
+	//fmt.Println("TOKEN IS:", token[1])
 	var key string
 	if isRefresh {
 		key = refreshTokenKey
@@ -41,7 +41,7 @@ func VerifyAdmin(AdminId, tokenRaw string) error {
 	if len(token) < 2 {
 		return fmt.Errorf("你没有在请求头携带token")
 	}
-	fmt.Println("TOKEN IS:", token[1])
+	//fmt.Println("TOKEN IS:", token[1])
 	//检查管理员身份
 	user, err := model.QueryUid(AdminId)
 	if err != nil {
