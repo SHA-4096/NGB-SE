@@ -13,6 +13,6 @@ func main() {
 		return c.String(http.StatusOK, "The server is running")
 	})
 	view.SetRouters(e)
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":8080"))
 
 }
