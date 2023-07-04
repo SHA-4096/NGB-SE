@@ -1,6 +1,7 @@
 package main
 
 import (
+	"NGB-SE/internal/util"
 	"NGB-SE/internal/view"
 	"net/http"
 
@@ -13,6 +14,7 @@ func main() {
 		return c.String(http.StatusOK, "The server is running")
 	})
 	view.SetRouters(e)
+	util.EmailClientInit()
 	e.Logger.Fatal(e.Start(":8080"))
 
 }
