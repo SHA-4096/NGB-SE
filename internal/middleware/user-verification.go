@@ -71,7 +71,8 @@ func EncodeMethod(input string) string {
 //邮箱认证，发送验证码部分
 //
 func SendVerificationEmail(Email string) error {
-	err := util.SendEmail(Email, "Verification-code", "text/html", "A Test")
+	content := fmt.Sprintf("您正在尝试使用邮箱登录到NGB-SE<br>您的验证码为：%s <br><br> 如果不是您本人操作，请忽略此邮件", util.GetRamdomCode(6))
+	err := util.SendEmail(Email, "Verification-code", "text/html", content)
 	return err
 }
 
