@@ -14,3 +14,10 @@ LogConfig:
   logPath: "YourLogPath"
   rotateTime: 1 #更新文件时间，以分钟计
   maxAge: 3 #最大记录时间，以分钟计
+
+EmailConfig:
+  emailAddress: "SenderEmailAddress"
+  smtpServer: "YourSmtpServer"
+  smtpPort: "YourSmtpPort"
+  name: "YourUserName"
+  password: "YourPassword"
