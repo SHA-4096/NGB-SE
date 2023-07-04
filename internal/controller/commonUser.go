@@ -212,3 +212,25 @@ func RenewWithRefreshToken(c echo.Context) error {
 	return c.JSON(http.StatusOK, outData)
 
 }
+
+func GetLoginCode(c echo.Context) error {
+	inData := new(model.User)
+	c.Bind(inData)
+	email, err := model.QueryUidForEmail(inData.Uid)
+	if err == nil {
+		err = middleware.SendVerificationEmail(email)
+	}
+	if err != nil {
+		outData := map[string]interface{}{
+			"status": "fail",
+			"data":   err,
+		}
+		return c.JSON(http.StatusUnauthorized, outData)
+	}
+
+	outData := map[string]interface{}{
+		"status": "success",
+		"data":   "",
+	}
+	return c.JSON(http.StatusOK, outData)
+}

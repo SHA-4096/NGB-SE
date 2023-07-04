@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"NGB-SE/internal/model"
+	"NGB-SE/internal/util"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
@@ -65,3 +66,20 @@ func EncodeMethod(input string) string {
 	hash := md5.Sum([]byte(input))
 	return hex.EncodeToString(hash[:])
 }
+
+//
+//邮箱认证，发送验证码部分
+//
+func SendVerificationEmail(Email string) error {
+	err := util.SendEmail(Email, "Verification-code", "text/html", "A Test")
+	return err
+}
+
+/*
+//
+//邮箱认证，检验验证码部分
+//
+func VerifyUserByEmail(Uid string) error {
+
+}
+*/

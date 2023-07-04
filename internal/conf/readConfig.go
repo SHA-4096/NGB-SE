@@ -25,16 +25,26 @@ type logConfigStruct struct {
 	MaxAge     int
 }
 
+type emailConfigStruct struct {
+	EmailAddress string
+	SmtpServer   string
+	SmtpPort     int
+	Name         string
+	Password     string
+}
+
 var (
-	DataBase  *dataBaseStruct
-	JwtConfig *jWTConfigStruct
-	LogConfig *logConfigStruct
+	DataBase    *dataBaseStruct
+	JwtConfig   *jWTConfigStruct
+	LogConfig   *logConfigStruct
+	EmailConfig *emailConfigStruct
 )
 
 func init() {
 	DataBase = new(dataBaseStruct)
 	JwtConfig = new(jWTConfigStruct)
 	LogConfig = new(logConfigStruct)
+	EmailConfig = new(emailConfigStruct)
 	//读取配置文件
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
@@ -55,6 +65,11 @@ func init() {
 	LogConfig.LogPath = viper.GetString("LogConfig.logPath")
 	LogConfig.RotateTime = viper.GetInt("LogConfig.rotateTime")
 	LogConfig.MaxAge = viper.GetInt("LogConfig.maxAge")
+	EmailConfig.EmailAddress = viper.GetString("EmailConfig.emailAddress")
+	EmailConfig.SmtpPort = viper.GetInt("EmailConfig.smtpPort")
+	EmailConfig.SmtpServer = viper.GetString("EmailConfig.smtpServer")
+	EmailConfig.Name = viper.GetString("EmailConfig.name")
+	EmailConfig.Password = viper.GetString("EmailConfig.password")
 	if err != nil {
 		panic(err)
 	}
