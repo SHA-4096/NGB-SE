@@ -8,5 +8,6 @@ type User struct {
 	Name     string
 	Password string
 	JwtKey   string
+	Email    string
 	IsAdmin  string
 }
