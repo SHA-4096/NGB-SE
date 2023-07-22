@@ -7,12 +7,15 @@ import (
 )
 
 type dataBaseStruct struct {
-	UserName string
-	PassWord string
-	Host     string
-	Port     string
-	DbName   string
-	TimeOut  string
+	UserName      string
+	PassWord      string
+	Host          string
+	Port          string
+	DbName        string
+	TimeOut       string
+	RedisAddr     string
+	RedisPassword string
+	RedisDB       int
 }
 
 type jWTConfigStruct struct {
@@ -61,6 +64,9 @@ func init() {
 	DataBase.Port = viper.GetString("DataBase.port")
 	DataBase.DbName = viper.GetString("DataBase.dbName")
 	DataBase.TimeOut = viper.GetString("DataBase.timeout")
+	DataBase.RedisAddr = viper.GetString("DataBase.redisAddr")
+	DataBase.RedisPassword = viper.GetString("DataBase.redisPassword")
+	DataBase.RedisDB = viper.GetInt("DataBase.redisDB")
 	JwtConfig.RefreshTokenKey = viper.GetString("JwtConfig.refreshTokenKey")
 	LogConfig.LogPath = viper.GetString("LogConfig.logPath")
 	LogConfig.RotateTime = viper.GetInt("LogConfig.rotateTime")

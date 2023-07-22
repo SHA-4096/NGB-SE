@@ -6,6 +6,9 @@ DataBase:
   port: "3306"
   dbName: "YourDbName"
   timeout: "10s"
+  redisAddr: "YourRedisAddr"
+  redisPassword: "YourRedisPassword"
+  redisDB: 0 #0 is the default db
 
 JWTConfig:
   refreshTokenKey: "YourRefreshTokenKey"

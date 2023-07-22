@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"NGB-SE/internal/controller/param"
 	"NGB-SE/internal/middleware"
 	"NGB-SE/internal/model"
 	"fmt"
@@ -233,4 +234,10 @@ func GetLoginCode(c echo.Context) error {
 		"data":   "",
 	}
 	return c.JSON(http.StatusOK, outData)
+}
+
+func SendLoginCode(c echo.Context) {
+	inData := new(param.RequestCodeLogin)
+	c.bind(inData)
+	//validicate
 }

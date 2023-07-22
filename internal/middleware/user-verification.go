@@ -76,11 +76,9 @@ func SendVerificationEmail(Email string) error {
 	return err
 }
 
-/*
 //
 //邮箱认证，检验验证码部分
 //
 func VerifyUserByEmail(Uid string) error {
-
+	
 }
-*/
