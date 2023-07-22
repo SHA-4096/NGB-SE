@@ -17,6 +17,7 @@ func SetRouters(e *echo.Echo) {
 	e.GET("/user/admin/:AdminId/delete/:Uid", controller.AdminDeleteUser)
 	e.POST("/user/admin/:AdminId/modify/:Uid", controller.AdminModifyUser)
 	e.POST("/user/get-login-code", controller.GetLoginCode)
+	e.POST("/user/send-login-code", controller.SendLoginCode)
 	//节点管理部分
 	e.POST("/nodes/:AdminId/create/zone", controller.CreateZone)
 	e.POST("/nodes/:Uid/create/passage", controller.CreatePassage)

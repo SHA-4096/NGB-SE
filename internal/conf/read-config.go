@@ -29,11 +29,12 @@ type logConfigStruct struct {
 }
 
 type emailConfigStruct struct {
-	EmailAddress string
-	SmtpServer   string
-	SmtpPort     int
-	Name         string
-	Password     string
+	EmailAddress      string
+	SmtpServer        string
+	SmtpPort          int
+	Name              string
+	Password          string
+	ExpirationSeconds int
 }
 
 var (
@@ -76,6 +77,7 @@ func init() {
 	EmailConfig.SmtpServer = viper.GetString("EmailConfig.smtpServer")
 	EmailConfig.Name = viper.GetString("EmailConfig.name")
 	EmailConfig.Password = viper.GetString("EmailConfig.password")
+	EmailConfig.ExpirationSeconds = viper.GetInt("EmailConfig.expirationSeconds")
 	if err != nil {
 		panic(err)
 	}

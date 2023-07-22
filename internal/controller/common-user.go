@@ -157,7 +157,6 @@ func ModifyUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, outData)
 	}
 	//找到用户时
-	fmt.Print(inData)
 	refUser := reflect.ValueOf(user).Elem()
 	fieldValue := refUser.FieldByName(inData.Key)
 	if fieldValue.IsValid() {
@@ -219,14 +218,16 @@ func GetLoginCode(c echo.Context) error {
 	c.Bind(inData)
 	email, err := model.QueryUidForEmail(inData.Uid)
 	if err == nil {
+		//找到邮箱
 		err = middleware.SendVerificationEmail(email)
 	}
 	if err != nil {
+		//找不到对应邮箱或信息发送失败
 		outData := map[string]interface{}{
 			"status": "fail",
-			"data":   err,
+			"data":   err.Error(),
 		}
-		return c.JSON(http.StatusUnauthorized, outData)
+		return c.JSON(http.StatusInternalServerError, outData)
 	}
 
 	outData := map[string]interface{}{
@@ -236,8 +237,52 @@ func GetLoginCode(c echo.Context) error {
 	return c.JSON(http.StatusOK, outData)
 }
 
-func SendLoginCode(c echo.Context) {
+func SendLoginCode(c echo.Context) error {
 	inData := new(param.RequestCodeLogin)
-	c.bind(inData)
-	//validicate
+	c.Bind(inData)
+	email, err := model.QueryUidForEmail(inData.Uid)
+	if err != nil {
+		//找不到对应邮箱
+		outData := map[string]interface{}{
+			"status": "fail",
+			"data":   err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
+	}
+	err = middleware.VerifyUserByEmail(email, inData.Code)
+	if err != nil {
+		//验证失败
+		outData := map[string]interface{}{
+			"status": "fail",
+			"data":   err.Error(),
+		}
+		return c.JSON(http.StatusUnauthorized, outData)
+	}
+	//获取用户结构体
+	user, err := model.QueryUid(inData.Uid)
+	if err != nil {
+		return err
+	}
+	jwtToken, key, err := middleware.GetJwt(user.Uid)
+	if err != nil {
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
+	}
+	user.JwtKey = key
+	model.SaveUser(user)
+	refreshToken, err := middleware.GetRefreshJwt(user.Uid)
+	if err != nil {
+		outData := map[string]interface{}{
+			"message": err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, outData)
+	}
+	outData := map[string]interface{}{
+		"jwtToken":     jwtToken,
+		"refreshToken": refreshToken,
+		"message":      fmt.Sprintf("welcome:%s", user.Name),
+	}
+	return c.JSON(http.StatusOK, outData)
 }

@@ -4,6 +4,7 @@ import (
 	config "NGB-SE/internal/conf"
 	"NGB-SE/internal/util"
 	"context"
+	"fmt"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -28,7 +29,7 @@ func init() {
 func SetKeyValuePair(key, value string) error {
 	err := redisClient.Do(redisCtx, "set", key, value).Err()
 	if err != nil {
-		util.MakeInfoLog(err.Error())
+		util.MakeInfoLog(fmt.Sprintf("Error at model.SetKeyValuePair,msg=%s", err.Error()))
 		return err
 	}
 	return nil
@@ -40,7 +41,7 @@ func SetKeyValuePair(key, value string) error {
 func SetExpiration(key string, seconds int) error {
 	err = redisClient.Do(redisCtx, "expire", key, seconds).Err()
 	if err != nil {
-		util.MakeInfoLog(err.Error())
+		util.MakeInfoLog(fmt.Sprintf("Error at model.SetExpiration,msg=%s", err.Error()))
 		return err
 	}
 	return nil
@@ -52,19 +53,18 @@ func SetExpiration(key string, seconds int) error {
 func DiscardExpiration(key string) error {
 	err = redisClient.Do(redisCtx, "persist", key).Err()
 	if err != nil {
-		util.MakeInfoLog(err.Error())
+		util.MakeInfoLog(fmt.Sprintf("Error at model.DiscardExpiration,msg=%s", err.Error()))
 		return err
 	}
 	return nil
 }
 
 //
-//Get the value of a specific key
+//Get the value of a specific key in redis
 //
 func GetKeyValue(key string) (string, error) {
 	val, err := redisClient.Get(redisCtx, key).Result()
 	if err != nil {
-		util.MakeInfoLog(err.Error())
 		return "", err
 	}
 	return val, nil

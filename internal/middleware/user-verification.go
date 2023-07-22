@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	config "NGB-SE/internal/conf"
 	"NGB-SE/internal/model"
 	"NGB-SE/internal/util"
 	"crypto/md5"
@@ -71,14 +72,41 @@ func EncodeMethod(input string) string {
 //邮箱认证，发送验证码部分
 //
 func SendVerificationEmail(Email string) error {
-	content := fmt.Sprintf("您正在尝试使用邮箱登录到NGB-SE<br>您的验证码为：%s <br><br> 如果不是您本人操作，请忽略此邮件", util.GetRamdomCode(6))
-	err := util.SendEmail(Email, "Verification-code", "text/html", content)
+	_, err := model.GetKeyValue(Email)
+	if err == nil {
+		return fmt.Errorf("请求过于频繁，请一段时间后再试")
+	}
+
+	//生成邮箱验证码
+	code := util.GetRamdomCode(6)
+	//设置键值对
+	err = model.SetKeyValuePair(Email, code)
+	if err != nil {
+		return err
+	}
+	//设置过期时间
+	err = model.SetExpiration(Email, config.EmailConfig.ExpirationSeconds)
+	if err != nil {
+		return err
+	}
+	//发送邮件
+	content := fmt.Sprintf("您正在尝试使用邮箱登录到NGB-SE<br>您的验证码为：%s <br><br> 如果不是您本人操作，请忽略此邮件", code)
+	err = util.SendEmail(Email, "Verification-code", "text/html", content)
 	return err
 }
 
 //
 //邮箱认证，检验验证码部分
 //
-func VerifyUserByEmail(Uid string) error {
-	
+func VerifyUserByEmail(Email string, code string) error {
+	val, err := model.GetKeyValue(Email)
+	if err != nil {
+		return err
+	}
+	if val != code {
+		//验证失败
+		return fmt.Errorf("验证码不正确或已过期，请重新获取")
+	}
+	//验证成功
+	return nil
 }
