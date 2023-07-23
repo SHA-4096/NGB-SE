@@ -34,7 +34,7 @@ paths:
                 Password:
                   type: string
                   description: User's password
-                subscription:
+                Subscription:
                   type: bool
                   description: Whether the user wish to receive subscription emails
     responses:
