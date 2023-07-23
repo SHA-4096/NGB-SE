@@ -24,4 +24,5 @@ EmailConfig:
   smtpPort: "YourSmtpPort"
   name: "YourUserName"
   password: "YourPassword"
-  expirationSeconds: 300 #How long ultil email expires
+  expirationSeconds: 300 #How long ultil login email expires
+  subscriptionHour: 8 # When to send subscription(24 hours)

@@ -35,6 +35,7 @@ type emailConfigStruct struct {
 	Name              string
 	Password          string
 	ExpirationSeconds int
+	SubscriptionHour  int
 }
 
 var (
@@ -78,6 +79,7 @@ func init() {
 	EmailConfig.Name = viper.GetString("EmailConfig.name")
 	EmailConfig.Password = viper.GetString("EmailConfig.password")
 	EmailConfig.ExpirationSeconds = viper.GetInt("EmailConfig.expirationSeconds")
+	EmailConfig.SubscriptionHour = viper.GetInt("EmailConfig.subscriptionHour")
 	if err != nil {
 		panic(err)
 	}
