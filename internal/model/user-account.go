@@ -8,6 +8,15 @@ func QueryUidAndPassword(Uid, PasswordEncoded string) (*User, error) {
 	return &user, err
 }
 
+//
+//Query all users that have email subscription
+//
+func QueryAllSubscriptors() ([]User, error) {
+	var users []User
+	err := db.Where("Subscribe= ?", true).First(&users).Error
+	return users, err
+}
+
 func CreateUser(Receiver *User) error {
 	err := db.Create(&Receiver).Error
 	return err
