@@ -14,7 +14,7 @@ var emailTargets chan string
 //发送用户的订阅邮件,每次发送后暂停一秒
 //
 func SendSubscription(targets <-chan string, id int) {
-	util.MakeInfoLog(fmt.Sprintf("email goroutine %d has started", id))
+	util.MakeInfoLog(fmt.Sprintf("[email subscription worker %d] has started", id))
 	for {
 		date := fmt.Sprintf("%d年%d月%d日", time.Now().Year(), time.Now().Month(), time.Now().Day())
 		content := fmt.Sprintf("今天是%s，NGB-SE祝你有个好心情", date)
@@ -35,7 +35,9 @@ func SendSubscription(targets <-chan string, id int) {
 //Send subscription email cronically
 //
 func CronSendScription() {
+	util.MakeInfoLog("[email subscription master] has started")
 	for {
+		util.MakeInfoLog("[email subscription master] goroutine running normally")
 		if time.Now().Hour() == config.EmailConfig.SubscriptionHour {
 			_, err := model.GetKeyValue("tag.subscriptionDone")
 			if err != nil {
@@ -54,6 +56,7 @@ func CronSendScription() {
 				util.MakeInfoLog("Finished subscription")
 			}
 		}
+		time.Sleep(time.Second * time.Duration(1800))
 	}
 
 }

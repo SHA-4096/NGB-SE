@@ -5,10 +5,6 @@ ENV GOPROXY "https://goproxy.cn"
 RUN go build -o /build/app cmd/server.go
 
 
-#FROM nginx as proxy
-#RUN rm /etc/nginx/conf.d/default.conf
-#COPY build/nginx-conf /etc/nginx/conf.d
-
 FROM alpine:3.15
 COPY --from=builder /build/app /usr/bin/app
 COPY --from=builder /src/config/config.yaml /config/config.yaml
