@@ -1,0 +1,793 @@
+{
+	"info": {
+		"version": "v2",
+		"about": "This is an api documentation exported by postman,for temporary use"
+	},
+	"item": [
+		{
+			"name": "用户管理",
+			"item": [
+				{
+					"name": "注册用户",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Name\": \"commonUser\",\r\n    \"Password\": \"123456\",\r\n    \"Uid\": \"222222\",\r\n    \"Email\":\"YourEmail\",\r\n    \"Subscription\": true\r\n}"
+						},
+						"url": "http://localhost:8080/user/register"
+					},
+					"response": []
+				},
+				{
+					"name": "用户登录",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"Uid\":\"000000\",\"Password\":\"123456\"}"
+						},
+						"url": "http://localhost:8080/user/login"
+					},
+					"response": []
+				},
+				{
+					"name": "更改用户信息",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Key\": \"Name\",\n    \"Value\": \"Jack\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/user/:Uid/modify",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								":Uid",
+								"modify"
+							],
+							"variable": [
+								{
+									"key": "Uid",
+									"value": "333333"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "管理员修改用户信息",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Key\": \"Name\",\n    \"Value\": \"ANameModifiedByAdmin\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/user/admin/:AdminId/modify/:Uid",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"admin",
+								":AdminId",
+								"modify",
+								":Uid"
+							],
+							"variable": [
+								{
+									"key": "AdminId",
+									"value": "000000"
+								},
+								{
+									"key": "Uid",
+									"value": "333333"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "管理员删除用户",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/user/admin/:AdminId/delete/:Uid",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"admin",
+								":AdminId",
+								"delete",
+								":Uid"
+							],
+							"variable": [
+								{
+									"key": "AdminId",
+									"value": "000000"
+								},
+								{
+									"key": "Uid",
+									"value": "222222"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "用户注销",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8080/user/:Uid/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								":Uid",
+								"logout"
+							],
+							"variable": [
+								{
+									"key": "Uid",
+									"value": "000000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "普通用户删除账户",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/user/:Uid/delete",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								":Uid",
+								"delete"
+							],
+							"variable": [
+								{
+									"key": "Uid",
+									"value": "222222"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "更新token",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{refreshToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/user/:Uid/refreshtoken",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								":Uid",
+								"refreshtoken"
+							],
+							"variable": [
+								{
+									"key": "Uid",
+									"value": "000000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "使用邮箱登录：获取验证码",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Uid\": \"666666\"\r\n}"
+						},
+						"url": "http://localhost:8080/user/get-login-code"
+					},
+					"response": []
+				},
+				{
+					"name": "使用邮箱登录：输入验证码",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Uid\": \"666666\",\r\n    \"Code\": \"530522\"\r\n}"
+						},
+						"url": "http://localhost:8080/user/send-login-code"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "节点管理",
+			"item": [
+				{
+					"name": "创建分区",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ZoneName\": \"测试分区\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/nodes/:AdminId/create/zone",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"nodes",
+								":AdminId",
+								"create",
+								"zone"
+							],
+							"variable": [
+								{
+									"key": "AdminId",
+									"value": "000000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "创建文章",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Content\": \"测试文章内容2\",\n    \"ZoneId\": \"2874168128226133015\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/nodes/:AdminId/create/passage",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"nodes",
+								":AdminId",
+								"create",
+								"passage"
+							],
+							"variable": [
+								{
+									"key": "AdminId",
+									"value": "000000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取给定分区的文章",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/nodes/get/passages/:ZoneId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"nodes",
+								"get",
+								"passages",
+								":ZoneId"
+							],
+							"variable": [
+								{
+									"key": "ZoneId",
+									"value": "2874168128226133015"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "获取所有的分区名称以及id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/nodes/get/zones"
+					},
+					"response": []
+				},
+				{
+					"name": "为文章点赞",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/view/passage/:PassageId/user/:Uid/like",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"view",
+								"passage",
+								":PassageId",
+								"user",
+								":Uid",
+								"like"
+							],
+							"variable": [
+								{
+									"key": "PassageId",
+									"value": "1142399048148187092"
+								},
+								{
+									"key": "Uid",
+									"value": "000000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "普通用户删除文章",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/nodes/:Uid/delete/passage/:PassageId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"nodes",
+								":Uid",
+								"delete",
+								"passage",
+								":PassageId"
+							],
+							"variable": [
+								{
+									"key": "Uid",
+									"value": "000000"
+								},
+								{
+									"key": "PassageId",
+									"value": "4110955259456608355"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "用户关系管理",
+			"item": [
+				{
+					"name": "查询好友的点赞记录",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/view/:Uid/likes/:FriendId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"view",
+								":Uid",
+								"likes",
+								":FriendId"
+							],
+							"variable": [
+								{
+									"key": "Uid",
+									"value": "333333"
+								},
+								{
+									"key": "FriendId",
+									"value": "000000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "添加好友",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/relation/:Uid/mkfriend/:FriendId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"relation",
+								":Uid",
+								"mkfriend",
+								":FriendId"
+							],
+							"variable": [
+								{
+									"key": "Uid",
+									"value": "000000"
+								},
+								{
+									"key": "FriendId",
+									"value": "333333"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "同意好友申请",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/relation/:Uid/agree/:FriendId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"relation",
+								":Uid",
+								"agree",
+								":FriendId"
+							],
+							"variable": [
+								{
+									"key": "Uid",
+									"value": "333333"
+								},
+								{
+									"key": "FriendId",
+									"value": "000000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "查询站内消息",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/message/:Uid",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"message",
+								":Uid"
+							],
+							"variable": [
+								{
+									"key": "Uid",
+									"value": "333333"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "关注用户",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/relation/:Uid/mkfollow/:FollowId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"relation",
+								":Uid",
+								"mkfollow",
+								":FollowId"
+							],
+							"variable": [
+								{
+									"key": "Uid",
+									"value": "333333"
+								},
+								{
+									"key": "FollowId",
+									"value": "000000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取消关注",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/relation/:Uid/unfollow/:FollowId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"relation",
+								":Uid",
+								"unfollow",
+								":FollowId"
+							],
+							"variable": [
+								{
+									"key": "Uid",
+									"value": "333333"
+								},
+								{
+									"key": "FollowId",
+									"value": "000000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "查询用户关注列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/relation/query/follows/:Uid",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"relation",
+								"query",
+								"follows",
+								":Uid"
+							],
+							"variable": [
+								{
+									"key": "Uid",
+									"value": "333333"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "ZoneId",
+			"value": "8704221062428405751"
+		},
+		{
+			"key": "hostName",
+			"value": "localhost:1323"
+		}
+	]
+}
