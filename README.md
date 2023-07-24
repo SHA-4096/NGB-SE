@@ -79,7 +79,8 @@ sudo docker run --network=host -v /etc/localtime:/etc/localtime ngb
 
 其中 `-v /etc/localtime:/etc/localtime`是为了使得容器内的时间和系统时间一致
 
+# API
 
-# DOC
+所有的api由postman导出为json文档了，可以查看./docs/postman-api.json
 
-api文档还没写好...相关功能可以去router.go查看
+后期会考虑写一个更加清楚的markdown文档
