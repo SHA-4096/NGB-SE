@@ -100,7 +100,7 @@ func LogOut(c echo.Context) error {
 	outData := map[string]interface{}{
 		"message": fmt.Sprintf("用户%s已经注销", c.Param("Uid")),
 	}
-	return c.JSON(http.StatusInternalServerError, outData)
+	return c.JSON(http.StatusOK, outData)
 }
 
 func DeleteUser(c echo.Context) error {

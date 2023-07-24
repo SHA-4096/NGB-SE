@@ -20,7 +20,7 @@ type AdminModifyUserINData struct {
 func AdminDeleteUser(c echo.Context) error {
 	/*POST src = /user/admin/{AdminId}/delete/{Uid}*/
 	tokenRaw := c.Request().Header.Get("Authorization")
-	err := middleware.VerifyAdmin(c.Param("AdminID"), tokenRaw)
+	err := middleware.VerifyAdmin(c.Param("AdminId"), tokenRaw)
 	if err != nil {
 		outData := map[string]interface{}{
 			"message": err.Error(),
