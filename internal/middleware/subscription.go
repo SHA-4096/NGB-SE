@@ -19,7 +19,7 @@ func SendSubscription(targets <-chan string, id int) {
 		date := fmt.Sprintf("%d年%d月%d日", time.Now().Year(), time.Now().Month(), time.Now().Day())
 		content := fmt.Sprintf("今天是%s，NGB-SE祝你有个好心情", date)
 		for target := range targets {
-			err := util.SendEmail(target, config.EmailConfig.EmailAddress, "text/plain", content)
+			err := util.SendEmail(target, config.Config.EmailConfig.EmailAddress, "text/plain", content)
 			if err != nil {
 				util.MakeInfoLog(fmt.Sprintf("Failed sending subscription email to %s,error:%s", target, err.Error()))
 			} else {
@@ -38,7 +38,7 @@ func CronSendScription() {
 	util.MakeInfoLog("[email subscription master] has started")
 	for {
 		util.MakeInfoLog("[email subscription master] goroutine running normally")
-		if time.Now().Hour() == config.EmailConfig.SubscriptionHour {
+		if time.Now().Hour() == config.Config.EmailConfig.SubscriptionHour {
 			_, err := model.GetKeyValue("tag.subscriptionDone")
 			if err != nil {
 				users, err := model.QueryAllSubscriptors()

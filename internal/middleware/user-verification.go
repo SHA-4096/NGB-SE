@@ -85,7 +85,7 @@ func SendVerificationEmail(Email string) error {
 		return err
 	}
 	//设置过期时间
-	err = model.SetExpiration(Email, config.EmailConfig.ExpirationSeconds)
+	err = model.SetExpiration(Email, config.Config.EmailConfig.ExpirationSeconds)
 	if err != nil {
 		return err
 	}

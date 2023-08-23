@@ -44,7 +44,7 @@ var err error
 
 func init() {
 	//拼接下dsn参数, dsn格式可以参考上面的语法，这里使用Sprintf动态拼接dsn参数，因为一般数据库连接参数，我们都是保存在配置文件里面，需要从配置文件加载参数，然后拼接dsn。
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local&timeout=%s", config.DataBase.UserName, config.DataBase.PassWord, config.DataBase.Host, config.DataBase.Port, config.DataBase.DbName, config.DataBase.TimeOut)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local&timeout=%s", config.Config.DataBase.UserName, config.Config.DataBase.PassWord, config.Config.DataBase.Host, config.Config.DataBase.Port, config.Config.DataBase.DbName, config.Config.DataBase.TimeOut)
 	//fmt.Println(dsn)
 	//连接MYSQL, 获得DB类型实例，用于后面的数据库读写操作。
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})

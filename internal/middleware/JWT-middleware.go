@@ -23,7 +23,7 @@ const refreshExpHours = 100
 var refreshTokenKey string
 
 func init() {
-	refreshTokenKey = config.JwtConfig.RefreshTokenKey
+	refreshTokenKey = config.Config.JWTConfig.RefreshTokenKey
 }
 
 func GetJwt(Uid string) (string, string, error) {

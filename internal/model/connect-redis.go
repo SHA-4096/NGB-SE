@@ -16,9 +16,9 @@ var (
 
 func init() {
 	redisClient = redis.NewClient(&redis.Options{
-		Addr:     config.DataBase.RedisAddr,
-		Password: config.DataBase.RedisPassword,
-		DB:       config.DataBase.RedisDB,
+		Addr:     config.Config.DataBase.RedisAddr,
+		Password: config.Config.DataBase.RedisPassword,
+		DB:       config.Config.DataBase.RedisDB,
 	})
 	redisCtx = context.Background()
 }

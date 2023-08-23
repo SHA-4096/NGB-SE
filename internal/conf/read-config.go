@@ -1,86 +1,61 @@
 package config
 
 import (
+	"fmt"
 	"os"
 
-	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 )
 
+type configStruct struct {
+	DataBase    dataBaseStruct    `yaml:"DataBase"`
+	JWTConfig   jWTConfigStruct   `yaml:"JWTConfig"`
+	LogConfig   logConfigStruct   `yaml:"LogConfig"`
+	EmailConfig emailConfigStruct `yaml:"EmailConfig"`
+}
+
 type dataBaseStruct struct {
-	UserName      string
-	PassWord      string
-	Host          string
-	Port          string
-	DbName        string
-	TimeOut       string
-	RedisAddr     string
-	RedisPassword string
-	RedisDB       int
+	UserName      string `yaml:"username"`
+	PassWord      string `yaml:"password"`
+	Host          string `yaml:"host"`
+	Port          string `yaml:"port"`
+	DbName        string `yaml:"dbName"`
+	TimeOut       string `yaml:"timeout"`
+	RedisAddr     string `yaml:"redisAddr"`
+	RedisPassword string `yaml:"redisPassword"`
+	RedisDB       int    `yaml:"redisDB"`
 }
 
 type jWTConfigStruct struct {
-	RefreshTokenKey string
+	RefreshTokenKey string `yaml:"refreshTokenKey"`
 }
 
 type logConfigStruct struct {
-	LogPath    string
-	RotateTime int
-	MaxAge     int
+	LogPath    string `yaml:"logPath"`
+	RotateTime int    `yaml:"rotateTime"`
+	MaxAge     int    `yaml:"maxAge"`
 }
 
 type emailConfigStruct struct {
-	EmailAddress      string
-	SmtpServer        string
-	SmtpPort          int
-	Name              string
-	Password          string
-	ExpirationSeconds int
-	SubscriptionHour  int
+	EmailAddress      string `yaml:"emailAddress"`
+	SmtpServer        string `yaml:"smtpServer"`
+	SmtpPort          int    `yaml:"smtpPort"`
+	Name              string `yaml:"name"`
+	Password          string `yaml:"password"`
+	ExpirationSeconds int    `yaml:"expirationSeconds"`
+	SubscriptionHour  int    `yaml:"subscriptionHour"`
 }
 
-var (
-	DataBase    *dataBaseStruct
-	JwtConfig   *jWTConfigStruct
-	LogConfig   *logConfigStruct
-	EmailConfig *emailConfigStruct
-)
+var Config configStruct
 
 func init() {
-	DataBase = new(dataBaseStruct)
-	JwtConfig = new(jWTConfigStruct)
-	LogConfig = new(logConfigStruct)
-	EmailConfig = new(emailConfigStruct)
-	//读取配置文件
-	viper.SetConfigName("config")
-	viper.AddConfigPath(".")
-	viper.SetConfigType("yaml")
-	file, err := os.Open("config/config.yaml")
+	yamlFile, err := os.ReadFile("config/config.yaml")
 	if err != nil {
-		panic(err)
+		panic("Error when loading config")
 	}
-	defer file.Close()
-	err = viper.ReadConfig(file)
-	DataBase.UserName = viper.GetString("DataBase.username")
-	DataBase.PassWord = viper.GetString("DataBase.password")
-	DataBase.Host = viper.GetString("DataBase.host")
-	DataBase.Port = viper.GetString("DataBase.port")
-	DataBase.DbName = viper.GetString("DataBase.dbName")
-	DataBase.TimeOut = viper.GetString("DataBase.timeout")
-	DataBase.RedisAddr = viper.GetString("DataBase.redisAddr")
-	DataBase.RedisPassword = viper.GetString("DataBase.redisPassword")
-	DataBase.RedisDB = viper.GetInt("DataBase.redisDB")
-	JwtConfig.RefreshTokenKey = viper.GetString("JwtConfig.refreshTokenKey")
-	LogConfig.LogPath = viper.GetString("LogConfig.logPath")
-	LogConfig.RotateTime = viper.GetInt("LogConfig.rotateTime")
-	LogConfig.MaxAge = viper.GetInt("LogConfig.maxAge")
-	EmailConfig.EmailAddress = viper.GetString("EmailConfig.emailAddress")
-	EmailConfig.SmtpPort = viper.GetInt("EmailConfig.smtpPort")
-	EmailConfig.SmtpServer = viper.GetString("EmailConfig.smtpServer")
-	EmailConfig.Name = viper.GetString("EmailConfig.name")
-	EmailConfig.Password = viper.GetString("EmailConfig.password")
-	EmailConfig.ExpirationSeconds = viper.GetInt("EmailConfig.expirationSeconds")
-	EmailConfig.SubscriptionHour = viper.GetInt("EmailConfig.subscriptionHour")
+	err = yaml.Unmarshal(yamlFile, &Config)
 	if err != nil {
-		panic(err)
+		panic("Error when unmarshaling")
 	}
+	fmt.Println("Config loaded")
 }
