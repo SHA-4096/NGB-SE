@@ -81,7 +81,10 @@ func AddFollow(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	//In station message
 	model.CreateMessage(c.Param("Uid"), c.Param("FollowId"), fmt.Sprintf("%s关注了你", c.Param("Uid")))
+	//RabbitMQ message
+	middleware.SendNotification(fmt.Sprintf("%s关注了你", c.Param("Uid")), c.Param("FollowId"))
 	msg := MsgStruct{
 		Message: "添加关注成功",
 	}

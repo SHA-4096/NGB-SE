@@ -1,6 +1,9 @@
 package model
 
-import "fmt"
+import (
+	"NGB-SE/internal/util"
+	"fmt"
+)
 
 const (
 	//二进制状态码
@@ -104,6 +107,10 @@ func CreateFollowRelation(Uid, FollowId string) error {
 		TargetId:     FollowId,
 	}
 	err := db.Create(&userRelation).Error
+	if err != nil {
+		util.MakeInfoLog("failed to create a follow relation")
+		return err
+	}
 	return err
 
 }

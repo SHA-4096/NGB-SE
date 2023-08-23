@@ -3,6 +3,7 @@ package middleware
 import (
 	"NGB-SE/internal/util"
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -11,7 +12,14 @@ import (
 
 var senderChannel *amqp.Channel
 
-func init() {
+type Message struct {
+	ContentType string `json:"contentType"`
+	Body        string `json:"body"`
+	TargetUid   string `json:"targetUid"`
+}
+
+func RabbitMQInit() {
+	util.MakeInfoLog("Initializing RabbitMQ middleware")
 	//establish connection
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	if err != nil {
@@ -24,8 +32,8 @@ func init() {
 	}
 	//decleare queue
 	queue, err := senderChannel.QueueDeclare(
-		"userActivity",
-		true,
+		"",
+		false,
 		false,
 		false,
 		false,
@@ -39,7 +47,7 @@ func init() {
 	}
 }
 
-func SendByteToQueue(databyte []byte) {
+func sendByteToQueue(databyte []byte) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	err := senderChannel.PublishWithContext(ctx,
@@ -56,4 +64,19 @@ func SendByteToQueue(databyte []byte) {
 	} else {
 		util.MakeInfoLog("[RabbitMQ]Message sent")
 	}
+	return err
+}
+
+func SendNotification(content, targetUid string) error {
+	var newMsg Message
+	newMsg.Body = content
+	newMsg.ContentType = "Notification"
+	newMsg.TargetUid = targetUid
+	fmt.Println(newMsg.TargetUid)
+	databyte, err := json.Marshal(&newMsg)
+	if err != nil {
+		util.MakeInfoLog("Failed whe marshaling")
+	}
+	err = sendByteToQueue(databyte)
+	return err
 }
